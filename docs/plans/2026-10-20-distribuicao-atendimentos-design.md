@@ -1,9 +1,11 @@
 # Spec — Distribuição de atendimentos N1/N2 (NDESK-70)
 
 - **Task:** [NDESK-70](https://plane.byte.newbyte.net.br/engenharia/browse/NDESK-70/) · `[NDesk] Distribuição de atendimentos`
-- **Data:** 2026-10-20 (desenho iniciado em 2026-10-16) · **Fase:** Planning · **Revisão:** v2 (v1 passou pela
+- **Data:** 2026-10-20 (desenho iniciado em 2026-10-16) · **Fase:** Planning · **Revisão:** v2.1 (v1 passou pela
   leitura de um builder independente e pelo grill-with-docs com modelo Claude — o Clodex não está instalado
-  nesta máquina e o usuário escolheu seguir com Claude; v2 incorpora os achados e as decisões do usuário)
+  nesta máquina e o usuário escolheu seguir com Claude; v2 incorpora os achados e as decisões do usuário;
+  v2.1, de 2026-10-28, troca o nome técnico `discord_id` por `discord_uid`, por decisão do usuário sobre um
+  achado do grill do plano)
 - **Branch:** `feat/ticket-distribution` (base `origin/newbyte-stable` @ `31f0e2b171`, tag `nb.v1.6.1`)
 - **Glossário:** [`docs/distribuicao/CONTEXT.md`](../distribuicao/CONTEXT.md) · **ADRs:** [`docs/distribuicao/adr/`](../distribuicao/adr/)
 - **Pesquisa de mercado:** `docs/pesquisas/pesquisa-load-balancer-atendimento.md`
@@ -91,10 +93,13 @@ para isso (`.claude/NEWBYTE_WORKFLOW.md`; mesmo motivo de `docs/csat/adr/0001-cs
     "Melhoria" e "4 sem previsão");
   - grupo de Disparos e o usuário responsável. Se o responsável for excluído, o campo é limpo e os Disparos
     seguem o rodízio do N2 até alguém escolher outro.
-- **Atributo de usuário "ID do Discord"** (`discord_id`, via ObjectManager, só dígitos, editável no cadastro
+- **Atributo de usuário "ID do Discord"** (`discord_uid`, via ObjectManager, só dígitos, editável no cadastro
   de agentes no admin; não aparece nas telas de cliente). Precisa ser atributo real e não `preferences`: o
   payload do webhook leva `ticket.owner` com os atributos, mas filtra `preferences`
   (`app/jobs/trigger_webhook_job/record_payload/base.rb`, `USER_ATTRIBUTE_FILTER`).
+  O nome técnico não termina em `_id`: o Zammad trata toda coluna `*_id` como relação (o histórico grava o
+  valor num inteiro de 4 bytes, e um ID do Discord tem de 17 a 19 dígitos; o ObjectManager recusa o nome).
+  **(decisão do usuário em 2026-10-28, revisão v2.1)**
 - **Permissão `admin.ticket_distribution`:** vem com o perfil Admin e pode ser dada a outros perfis. Quem a
   tem vê a tela e a carga.
 
@@ -273,9 +278,9 @@ Uma ação nova de `perform_changes`, configurável em macros e triggers, com um
 
 ### 6.4 Payload do webhook e Discord
 
-O `ticket.owner` do payload passa a levar o `discord_id` sem mudança no webhook: o de produção usa o payload
+O `ticket.owner` do payload passa a levar o `discord_uid` sem mudança no webhook: o de produção usa o payload
 padrão, e atributos de usuário criados pelo ObjectManager entram nele. O n8n monta a menção
-`<@{{ discord_id }}>`; se o campo estiver vazio, menciona pelo nome (§8.1).
+`<@{{ discord_uid }}>`; se o campo estiver vazio, menciona pelo nome (§8.1).
 
 **O n8n continua reconhecendo o repasse pelo texto do artigo** ("Realizamos uma análise prévia da sua
 ocorrência") para mencionar o dono no Discord e mandar o e-mail "em andamento" ao cliente, como já faz com
@@ -327,9 +332,9 @@ nó removido. O plano traz este roteiro como tarefa manual da virada, executada 
 | Ramo | Cadeia hoje | Depois |
 |---|---|---|
 | Ticket Criado | `Webhook canal de tickets no discord1 → adiciona Marcus → É melhoria? → Email de criação1 / Roadmap de melhorias1` | Remover "adiciona Marcus" (`owner_id 585`) e ligar `Webhook canal de tickets no discord1 → É melhoria?`. Sem isso, o cliente deixa de receber o e-mail de abertura. |
-| Ticket Atualizado, saída "Passa para o N2 e entra em andamento" do `Switch1` | `Switch1 → Call 'LB - Atribuição de Ticket' → Switch (nomes) → Mensagem marcando X → Email de em andamento` | Remover a chamada ao LB, o switch de nomes e as mensagens por pessoa. Ligar `Switch1 → (novo) Mensagem marcando o dono → Email de em andamento`, com `<@discord_id>` e o nome como reserva. |
+| Ticket Atualizado, saída "Passa para o N2 e entra em andamento" do `Switch1` | `Switch1 → Call 'LB - Atribuição de Ticket' → Switch (nomes) → Mensagem marcando X → Email de em andamento` | Remover a chamada ao LB, o switch de nomes e as mensagens por pessoa. Ligar `Switch1 → (novo) Mensagem marcando o dono → Email de em andamento`, com `<@discord_uid>` e o nome como reserva. |
 | Ticket Atualizado, saída de fallback do `Switch1` | `É o suporte?` testa `article.updated_by_id` igual a 11, 5 ou 6 | Trocar pelo teste "artigo de agente e não interno" (`article.sender == "Agent"` e `article.internal == false`) **(decisão do usuário)**. Consequência aceita: as respostas do N1 (585), que hoje não estão na lista, passam a gerar o e-mail "Acabou de receber uma atualização" ao cliente. |
-| Ticket Reaberto | `não é reaberto → Mensagem marcando a reabertura` | A mensagem passa a mencionar o dono pelo `discord_id`, que depois da ação já é o dono certo. |
+| Ticket Reaberto | `não é reaberto → Mensagem marcando a reabertura` | A mensagem passa a mencionar o dono pelo `discord_uid`, que depois da ação já é o dono certo. |
 | Ticket Fechado | `Define notificação → Call 'LB - Liberação de Pontos' → Send email2` | Remover a chamada e ligar `Define notificação` (saída "Ticket Fechado") direto no `Send email2`. A chamada tem "Always Output Data"; sem religar, o cliente deixa de receber o e-mail de fechamento. |
 
 Depois: desativar **"LB - Atribuição de Ticket"** e **"LB - Liberação de Pontos"**. A data table
@@ -412,9 +417,9 @@ Antes de rodar: `rm -f db/schema.rb` (o banco de teste é construído por migrat
 - **Request specs:** `PUT /api/v1/tickets/:id` com a macro sem complexidade devolve 422 com a mensagem e não
   grava nada; `POST /api/v1/tickets/mass_macro` com um ticket sem complexidade recusa o lote.
 - **Concorrência:** repasses em paralelo, individual e em lote, não caem no mesmo agente nem travam.
-- **Payload do webhook** com o `discord_id` do dono (critério 6, lado NDesk).
+- **Payload do webhook** com o `discord_uid` do dono (critério 6, lado NDesk).
 - **Exclusão de usuário** membro das listas e responsável de Disparos (inclusive pela DataPrivacyTask).
-- **Permissão, policy e controller** da tela; **migração** (permissão, settings, atributo `discord_id`,
+- **Permissão, policy e controller** da tela; **migração** (permissão, settings, atributo `discord_uid`,
   triggers desligados); specs que enumeram modelos e referências atualizadas.
 - **Atributos de produção nos specs:** criar o atributo `complexidades` pelo ObjectManager e os estados e
   prioridades customizados nas factories.
