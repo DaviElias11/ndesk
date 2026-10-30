@@ -70,8 +70,8 @@ class TicketsMassController < ApplicationController
     clean_params
   end
 
-  # Refused before the transaction, not by the action in the middle of it: the rollback would undo the writes of the
-  # previous tickets, but their events would stay in the EventBuffer and be dispatched by the next request of the thread.
+  # Refused before the first write, not by the action in the middle of the batch: the rollback would undo the writes of
+  # the previous tickets, but their events would stay in the EventBuffer and be dispatched by the next request of the thread.
   def render_complexity_missing(tickets)
     error = Ticket::Distribution::ComplexityMissingError.new
 
@@ -88,6 +88,15 @@ class TicketsMassController < ApplicationController
 
     ActiveRecord::Base.transaction do
       tickets = Ticket::Distribution::MacroGuard.lock_for(macro, tickets)
+
+      # Checked again on what the lock has read, and before the first write. With the rows locked it cannot change anymore.
+      missing_complexity = Ticket::Distribution::MacroGuard.tickets_missing_complexity(macro, tickets)
+
+      if missing_complexity.any?
+        render_complexity_missing(missing_complexity)
+
+        next
+      end
 
       tickets.each(&)
 

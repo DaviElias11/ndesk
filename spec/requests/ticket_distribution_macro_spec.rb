@@ -111,6 +111,31 @@ RSpec.describe 'Ticket distribution macros', :aggregate_failures, db_strategy: :
       expect(n2_a.reload.last_assigned_at).to be_nil
     end
 
+    it 'refuses before writing anything when a ticket lost its complexity by the time of the lock' do
+      ticket.update!(complexidades: 'moderado')
+      expect(filled.id).to be > ticket.id # the lock goes by id: the ticket without complexity is the second one to be handled
+      EventBuffer.reset('transaction')
+
+      allow(Ticket::Distribution::Lock).to receive(:lock_tickets!).and_wrap_original do |original, ids|
+        Ticket.where(id: filled.id).update_all(complexidades: nil)
+
+        original.call(ids)
+      end
+
+      expect { post '/api/v1/tickets/mass_macro', params: { macro_id: macro.id, ticket_ids: [ticket.id, filled.id] }, as: :json }
+        .not_to change { article_counts }
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json_response).to include('error_human'          => 'Fill in the complexity before handing over.',
+                                       'unprocessable_entity' => 'ticket_distribution.complexity_missing',
+                                       'ticket_ids'           => [filled.id])
+      expect(ticket.reload.owner_id).to eq(n1.user_id)
+      expect(filled.reload.owner_id).to eq(n1.user_id)
+      expect(n2_a.reload.last_assigned_at).to be_nil
+      expect(n2_b.reload.last_assigned_at).to be_nil
+      expect(EventBuffer.list('transaction')).to be_empty
+    end
+
     it 'does not refuse a macro that writes the complexity itself' do
       writing_macro = create(:macro, perform: distribution_perform.merge('ticket.complexidades' => { 'value' => 'facil' }))
 
