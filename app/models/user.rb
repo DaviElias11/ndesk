@@ -27,6 +27,7 @@ class User < ApplicationModel
   include User::UpdatesTicketOrganization
   include User::OutOfOffice
   include User::Permissions
+  include User::TicketDistributionMembership
 
   has_and_belongs_to_many :organizations,          after_add: %i[cache_update create_organization_add_history], after_remove: %i[cache_update create_organization_remove_history], before_add: %i[check_organization_uniqueness], class_name: 'Organization'
   has_and_belongs_to_many :overviews,              dependent: :nullify

@@ -32,6 +32,13 @@ class Ticket::Distribution::Config
     current
   end
 
+  # Clears the Disparos responsible when it is the given user; the Disparos group is kept.
+  def self.release_dispatch_user!(user_id)
+    return if current.dispatch_user_id != user_id
+
+    update!(dispatch_user_id: nil)
+  end
+
   # Ticket attributes that can be used as the complexity source: active, editable selects without relation.
   def self.complexity_attribute_options
     ObjectManager::Attribute

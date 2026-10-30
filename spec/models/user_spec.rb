@@ -700,6 +700,7 @@ RSpec.describe User, type: :model do
         'PostmasterFilter'                   => { 'created_by_id' => 0, 'updated_by_id' => 0 },
         'PublicLink'                         => { 'created_by_id' => 1, 'updated_by_id' => 0 },
         'User::TwoFactorPreference'          => { 'created_by_id' => 1, 'updated_by_id' => 1, 'user_id' => 1 },
+        'Ticket::DistributionMember'         => { 'user_id' => 1, 'created_by_id' => 0, 'updated_by_id' => 0 },
         'OnlineNotification'                 => { 'user_id' => 1, 'created_by_id' => 0, 'updated_by_id' => 0 },
         'Ticket'                             => { 'created_by_id' => 0, 'updated_by_id' => 0, 'owner_id' => 1, 'customer_id' => 3 },
         'Template'                           => { 'created_by_id' => 0, 'updated_by_id' => 0 },
@@ -779,6 +780,7 @@ RSpec.describe User, type: :model do
       public_link                = create(:public_link, created_by: user)
       user_two_factor_preference = create(:user_two_factor_preference, :authenticator_app, user: user)
       user_overview_sorting      = create(:'user/overview_sorting', user: user)
+      distribution_member        = create(:ticket_distribution_member, user: user)
       expect(overview.reload.user_ids).to eq([user.id])
 
       # create a chat agent for admin user (id=1) before agent user
@@ -830,6 +832,7 @@ RSpec.describe User, type: :model do
       expect { chat_message2.reload }.to raise_exception(ActiveRecord::RecordNotFound)
       expect { user_two_factor_preference.reload }.to raise_exception(ActiveRecord::RecordNotFound)
       expect { user_overview_sorting.reload }.to raise_exception(ActiveRecord::RecordNotFound)
+      expect { distribution_member.reload }.to raise_exception(ActiveRecord::RecordNotFound)
 
       # move ownership objects
       expect { group.reload }.to change(group, :created_by_id).to(1)
