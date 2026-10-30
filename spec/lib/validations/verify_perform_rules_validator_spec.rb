@@ -53,6 +53,28 @@ RSpec.describe Validations::VerifyPerformRulesValidator do
     end
   end
 
+  context 'when validating the ticket distribution action', :aggregate_failures do
+    it 'makes a macro without mode invalid' do
+      macro = build(:macro, perform: { 'distribution.ticket_distribution' => {} })
+
+      expect(macro).not_to be_valid
+      expect(macro.errors.full_messages.join).to include('distribution.ticket_distribution, value')
+    end
+
+    it 'makes a macro with an unknown mode invalid' do
+      macro = build(:macro, perform: { 'distribution.ticket_distribution' => { 'value' => 'foo' } })
+
+      expect(macro).not_to be_valid
+      expect(macro.errors.full_messages.join).to include('distribution.ticket_distribution, value')
+    end
+
+    %w[entry handover reopening].each do |mode|
+      it "accepts the mode #{mode}" do
+        expect(build(:macro, perform: { 'distribution.ticket_distribution' => { 'value' => mode } })).to be_valid
+      end
+    end
+  end
+
   context 'when validating presence with precondition' do
     it 'is valid when required value for specific precondition is present' do
       instance.sample = { 'ticket.customer_id' => { 'pre_condition' => 'specific', 'value' => '123' } }

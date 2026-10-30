@@ -2,13 +2,14 @@
 
 class Validations::VerifyPerformRulesValidator < ActiveModel::EachValidator
   CHECK_PRESENT = {
-    'article.note'                => %w[body subject internal],
-    'notification.email'          => %w[body recipient subject],
-    'notification.sms'            => %w[body recipient],
-    'notification.webhook'        => %w[webhook_id],
-    'ai.ai_agent'                 => %w[ai_agent_id],
-    'x-zammad-ticket-owner_id'    => %w[value], # PostmasterFilter
-    'x-zammad-ticket-customer_id' => %w[value], # PostmasterFilter
+    'article.note'                     => %w[body subject internal],
+    'notification.email'               => %w[body recipient subject],
+    'notification.sms'                 => %w[body recipient],
+    'notification.webhook'             => %w[webhook_id],
+    'ai.ai_agent'                      => %w[ai_agent_id],
+    'distribution.ticket_distribution' => %w[value],
+    'x-zammad-ticket-owner_id'         => %w[value], # PostmasterFilter
+    'x-zammad-ticket-customer_id'      => %w[value], # PostmasterFilter
   }.freeze
 
   CHECK_SPECIFIC_PRESENT = %w[
@@ -22,6 +23,7 @@ class Validations::VerifyPerformRulesValidator < ActiveModel::EachValidator
 
     check_present(record, attribute, value)
     check_specific_present(record, attribute, value)
+    check_distribution_mode(record, attribute, value)
   end
 
   private
@@ -57,6 +59,14 @@ class Validations::VerifyPerformRulesValidator < ActiveModel::EachValidator
 
       result << key if value[key]['value'].blank?
     end
+  end
+
+  def check_distribution_mode(record, attribute, value)
+    action = value['distribution.ticket_distribution']
+    return if !action.is_a?(Hash) || action['value'].blank?
+    return if Ticket::PerformChanges::Action::TicketDistribution::MODES.include?(action['value'])
+
+    add_error(record, attribute, 'distribution.ticket_distribution', 'value')
   end
 
   def add_error(record, attribute, key, inner)

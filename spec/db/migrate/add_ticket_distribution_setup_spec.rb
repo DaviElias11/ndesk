@@ -21,5 +21,6 @@ RSpec.describe AddTicketDistributionSetup, :aggregate_failures, type: :db_migrat
     expect([entry.active, reopen.active]).to eq([false, false])
     expect(entry.perform).to eq('distribution.ticket_distribution' => { 'value' => 'entry' })
     expect(reopen.condition['ticket.state_id']).to eq('operator' => 'has changed')
+    expect(reopen.perform).to eq('distribution.ticket_distribution' => { 'value' => 'reopening' })
   end
 end

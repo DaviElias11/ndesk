@@ -28,4 +28,9 @@ RSpec.describe 'Ticket distribution seeds', :aggregate_failures do # rubocop:dis
     expect(triggers.count).to eq(2)
     expect(triggers.pluck(:active)).to eq([false, false])
   end
+
+  it 'seeds the distribution triggers with modes the action knows' do
+    expect(Trigger.find_by(name: 'Distribuição — Entrada').perform).to eq('distribution.ticket_distribution' => { 'value' => 'entry' })
+    expect(Trigger.find_by(name: 'Distribuição — Reabertura').perform).to eq('distribution.ticket_distribution' => { 'value' => 'reopening' })
+  end
 end

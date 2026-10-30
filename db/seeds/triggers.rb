@@ -134,7 +134,7 @@ Trigger.create_if_not_exists(
     'ticket.action'   => { 'operator' => 'is', 'value' => 'update' },
     'ticket.state_id' => { 'operator' => 'has changed' },
   },
-  perform:                  { 'distribution.ticket_distribution' => { 'value' => 'reopen' } },
+  perform:                  { 'distribution.ticket_distribution' => { 'value' => 'reopening' } },
   activator:                'action',
   execution_condition_mode: 'selective',
   active:                   false,
