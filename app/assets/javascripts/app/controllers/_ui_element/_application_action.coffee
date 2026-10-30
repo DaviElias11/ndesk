@@ -8,6 +8,10 @@ UI Element options:
 
 - Allows to send notifications (default: false)
 
+**attribute.ticket_distribution**
+
+- Allows to hand tickets over through the ticket distribution (default: false)
+
 **attribute.ticket_delete**
 
 - Allows to delete the ticket (default: false)
@@ -63,6 +67,10 @@ class App.UiElement.ApplicationAction
       groups.ai =
         name: __('AI')
         model: 'AI'
+
+    if attribute.ticket_distribution
+      groups.distribution =
+        name: __('Ticket Distribution')
 
     # merge config
     elements = {}
@@ -126,6 +134,20 @@ class App.UiElement.ApplicationAction
         translate: true
         options:
           delete: 'Delete'
+
+    # add ticket distribution action
+    if attribute.ticket_distribution
+      elements['distribution.ticket_distribution'] =
+        name: 'ticket_distribution'
+        display: __('Ticket Distribution')
+        tag: 'select'
+        null: false
+        translate: true
+        options: [
+          { value: 'entry', name: __('Entry (N1)') },
+          { value: 'handover', name: __('Hand over to N2') },
+          { value: 'reopening', name: __('Reopening') },
+        ]
 
     # add sender type selection as a ticket attribute
     if attribute.sender_type

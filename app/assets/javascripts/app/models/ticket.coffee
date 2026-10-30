@@ -115,6 +115,8 @@ class App.Ticket extends App.Model
         App.i18n.translateContent('Ticket |%s| has escalated!', item.title)
       when 'escalation_warning'
         App.i18n.translateContent('Ticket |%s| will escalate soon!', item.title)
+      when 'distribution_not_handed_over'
+        App.i18n.translateContent('Ticket |%s| was not handed over: no N2 agent in the rotation', item.title)
       when 'update.merged_into'
         App.i18n.translateContent('Ticket |%s| was merged into another ticket', item.title)
       when 'update.received_merge'
@@ -193,8 +195,8 @@ class App.Ticket extends App.Model
         for articleKey, aricleValue of content
           params.article[articleKey] = aricleValue
 
-      # perform AI agent or notification changes later
-      else if attributes[0] is 'ai' or attributes[0] is 'notification'
+      # perform AI agent, notification or distribution changes later
+      else if attributes[0] is 'ai' or attributes[0] is 'notification' or attributes[0] is 'distribution'
         params.ticket['macro.perform_changes'] ||= []
         params.ticket['macro.perform_changes'].push "#{attributes[0]}.#{attributes[1]}"
 

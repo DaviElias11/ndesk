@@ -1222,11 +1222,17 @@ class App.TicketZoom extends App.Controller
         error = undefined
         if settings && settings.responseJSON && settings.responseJSON.error
           error = settings.responseJSON.error
-        App.Event.trigger 'notify', {
-          type:    'error'
-          msg:     details.error_human || details.error || error || __('Saving failed.')
-          timeout: 2000
-        }
+        notice =
+          type: 'error'
+          msg:  details.error_human || details.error || error || __('Saving failed.')
+
+        # the distribution refusal stays until it is closed, other errors fade out
+        if settings?.responseJSON?.unprocessable_entity is 'ticket_distribution.complexity_missing'
+          notice.sticky = true
+        else
+          notice.timeout = 2000
+
+        App.Event.trigger 'notify', notice
         @autosaveStart()
         @muteTask()
         @fetch()

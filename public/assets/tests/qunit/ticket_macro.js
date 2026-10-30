@@ -97,3 +97,19 @@ QUnit.module("ticket macro pending time check", hooks => {
     assert.equal(calculate_travel_on_ticket_diff(rules, 'custom_date'), 60 * 3 * 1000)
   });
 })
+
+QUnit.module("ticket macro distribution action", () => {
+  QUnit.test("distribution action is deferred to the server", assert => {
+    var ticket = new App.Ticket()
+    App.Ticket.macro({
+      ticket: ticket,
+      article: {},
+      macro: {
+        'distribution.ticket_distribution': { value: 'handover' },
+        'ticket.state_id': { value: 2 },
+      }
+    })
+    assert.deepEqual(ticket['macro.perform_changes'], ['distribution.ticket_distribution'])
+    assert.equal(ticket.state_id, 2)
+  })
+})

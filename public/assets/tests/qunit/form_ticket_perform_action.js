@@ -863,3 +863,68 @@ QUnit.test( "ticket_perform_action allows to load data from external data source
 
   assert.deepEqual(params, test_params, 'form param check')
 });
+
+QUnit.test( "ticket_perform_action distribution action", assert => {
+  $('#forms').append('<hr><h1>ticket_perform_action distribution</h1><form id="form_distribution"></form><form id="form_no_distribution"></form>')
+
+  var el = $('#form_distribution')
+
+  new App.ControllerForm({
+    el:        el,
+    model:     {
+      configure_attributes: [
+        {
+          name:                'ticket_perform_action_distribution',
+          display:             'TicketPerformActionDistribution',
+          tag:                 'ticket_perform_action',
+          null:                true,
+          ticket_distribution: true,
+        },
+      ]
+    },
+    params: {
+      ticket_perform_action_distribution: {
+        'distribution.ticket_distribution': {
+          value: 'handover'
+        }
+      }
+    },
+    autofocus: true
+  })
+
+  var params = App.ControllerForm.params(el)
+  assert.deepEqual(params, {
+    ticket_perform_action_distribution: {
+      'distribution.ticket_distribution': {
+        value: 'handover'
+      }
+    }
+  }, 'form param check')
+
+  assert.equal(el.find('.js-attributeSelector option[value="distribution.ticket_distribution"]').length, 1, 'option present with flag')
+  assert.deepEqual(
+    el.find('.js-value select option').map(function() { return $(this).attr('value') }).get(),
+    ['entry', 'handover', 'reopening'],
+    'modes'
+  )
+
+  var elWithout = $('#form_no_distribution')
+
+  new App.ControllerForm({
+    el:        elWithout,
+    model:     {
+      configure_attributes: [
+        {
+          name:    'ticket_perform_action_no_distribution',
+          display: 'TicketPerformActionNoDistribution',
+          tag:     'ticket_perform_action',
+          null:    true,
+        },
+      ]
+    },
+    params: {},
+    autofocus: true
+  })
+
+  assert.equal(elWithout.find('.js-attributeSelector option[value="distribution.ticket_distribution"]').length, 0, 'option absent without flag')
+});

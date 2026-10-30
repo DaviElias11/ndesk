@@ -29,10 +29,16 @@ InstanceMethods =
 
         return if xhr.status != 422
 
-        message = if xhr.responseJSON.error && ticket = App.Ticket.find(xhr.responseJSON.ticket_id)
-                    App.i18n.translateContent(__('Ticket failed to save: %s'), ticket.title)
-                  else
-                    error
+        ticket = App.Ticket.find(xhr.responseJSON.ticket_id) if xhr.responseJSON.error
+
+        if xhr.responseJSON?.unprocessable_entity is 'ticket_distribution.complexity_missing'
+          titles = for id in xhr.responseJSON.ticket_ids || []
+            App.Utils.htmlEscape(App.Ticket.find(id)?.title || "##{id}")
+          message = [App.i18n.translateContent(xhr.responseJSON.error_human)].concat(titles).join('<br>')
+        else if ticket
+          message = App.i18n.translateContent(__('Ticket failed to save: %s'), ticket.title)
+        else
+          message = error
 
         new App.ErrorModal(
           head: __('Bulk action failed')

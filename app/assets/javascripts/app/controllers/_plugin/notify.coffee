@@ -88,7 +88,7 @@ class App.Notify extends App.Controller
       animation:
         open:    'animated fadeInDown'
         close:   'animated fadeOutDown'
-      timeout:   data.timeout || 3800
+      timeout:   if data.sticky then false else (data.timeout || 3800)
       closeWith: ['click']
     )
 
