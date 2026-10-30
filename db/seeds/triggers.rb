@@ -116,3 +116,28 @@ Trigger.create_or_update(
   created_by_id:            1,
   updated_by_id:            1,
 )
+
+Trigger.create_if_not_exists(
+  name:                     __('Distribuição — Entrada'),
+  condition:                { 'ticket.action' => { 'operator' => 'is', 'value' => 'create' } },
+  perform:                  { 'distribution.ticket_distribution' => { 'value' => 'entry' } },
+  activator:                'action',
+  execution_condition_mode: 'selective',
+  active:                   false,
+  created_by_id:            1,
+  updated_by_id:            1,
+)
+
+Trigger.create_if_not_exists(
+  name:                     __('Distribuição — Reabertura'),
+  condition:                {
+    'ticket.action'   => { 'operator' => 'is', 'value' => 'update' },
+    'ticket.state_id' => { 'operator' => 'has changed' },
+  },
+  perform:                  { 'distribution.ticket_distribution' => { 'value' => 'reopen' } },
+  activator:                'action',
+  execution_condition_mode: 'selective',
+  active:                   false,
+  created_by_id:            1,
+  updated_by_id:            1,
+)

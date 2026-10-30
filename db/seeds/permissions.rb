@@ -550,6 +550,13 @@ Permission.create_if_not_exists(
   preferences: { prio: 1335 },
 )
 
+Permission.create_if_not_exists(
+  name:        'admin.ticket_distribution',
+  label:       __('Ticket Distribution'),
+  description: __('Manage the N1/N2 ticket distribution.'),
+  preferences: { prio: 1336 },
+)
+
 admin = Role.find_by(name: 'Admin')
 admin.permission_grant('user_preferences')
 admin.permission_grant('admin')

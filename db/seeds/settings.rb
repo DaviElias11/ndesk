@@ -6251,3 +6251,23 @@ Setting.create_if_not_exists(
   },
   frontend:    false,
 )
+
+Setting.create_if_not_exists(
+  title:       __('Ticket distribution'),
+  name:        'ticket_distribution',
+  area:        'Ticket::Distribution',
+  description: __('Configuration of the N1/N2 ticket distribution.'),
+  options:     {},
+  state:       {
+    'complexity_attribute' => 'complexidades',
+    'weights'              => { 'facil' => 1, 'moderado' => 3, 'complexo' => 6 },
+    'ignored_state_ids'    => [],
+    'ignored_priority_ids' => [],
+    'dispatch_group_id'    => nil,
+    'dispatch_user_id'     => nil,
+  },
+  preferences: {
+    permission: ['admin.ticket_distribution'],
+  },
+  frontend:    false,
+)

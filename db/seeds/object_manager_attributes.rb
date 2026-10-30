@@ -1916,6 +1916,46 @@ ObjectManager::Attribute.add(
 )
 
 ObjectManager::Attribute.add(
+  force:         true,
+  object:        'User',
+  name:          'discord_uid',
+  display:       __('Discord ID'),
+  data_type:     'input',
+  data_option:   {
+    type:       'text',
+    maxlength:  30,
+    null:       true,
+    item_class: 'formGroup--halfSize',
+    permission: ['admin.user'],
+  },
+  editable:      false,
+  active:        true,
+  screens:       {
+    edit:   {
+      '-all-' => {
+        null: true,
+      },
+    },
+    create: {
+      '-all-' => {
+        null: true,
+      },
+    },
+    view:   {
+      '-all-' => {
+        shown: false,
+      },
+    },
+  },
+  to_create:     false,
+  to_migrate:    false,
+  to_delete:     false,
+  position:      1495,
+  created_by_id: 1,
+  updated_by_id: 1,
+)
+
+ObjectManager::Attribute.add(
   force:       true,
   object:      'Organization',
   name:        'vip',
