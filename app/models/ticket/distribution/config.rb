@@ -22,11 +22,11 @@ class Ticket::Distribution::Config
     params = params.to_h.stringify_keys.slice(*DEFAULTS.keys)
 
     validate_complexity_attribute!(params['complexity_attribute']) if params.key?('complexity_attribute')
-    validate_weights!(params['weights'])                           if params.key?('weights')
-    validate_ids!(Ticket::State, params['ignored_state_ids']) if params.key?('ignored_state_ids')
-    validate_ids!(Ticket::Priority, params['ignored_priority_ids']) if params.key?('ignored_priority_ids')
-    validate_ids!(::Group, params['dispatch_group_id'])              if params.key?('dispatch_group_id')
-    validate_ids!(::User, params['dispatch_user_id'])                if params.key?('dispatch_user_id')
+    params['weights']              = coerce_weights!(params['weights'])                                  if params.key?('weights')
+    params['ignored_state_ids']    = coerce_ids!(Ticket::State, params['ignored_state_ids'])             if params.key?('ignored_state_ids')
+    params['ignored_priority_ids'] = coerce_ids!(Ticket::Priority, params['ignored_priority_ids'])       if params.key?('ignored_priority_ids')
+    params['dispatch_group_id']    = coerce_id!(::Group, params['dispatch_group_id'])                    if params.key?('dispatch_group_id')
+    params['dispatch_user_id']     = coerce_id!(::User, params['dispatch_user_id'])                      if params.key?('dispatch_user_id')
 
     Setting.set(SETTING, current.to_h.merge(params))
     current
@@ -56,23 +56,44 @@ class Ticket::Distribution::Config
   end
   private_class_method :validate_complexity_attribute!
 
-  def self.validate_weights!(weights)
-    valid = weights.respond_to?(:all?) && weights.all? { |_, weight| weight.is_a?(Integer) && weight >= 0 }
+  def self.coerce_integer(value)
+    return value if value.is_a?(Integer) && value >= 0
+    return value.to_i if value.is_a?(String) && value.match?(%r{\A\d+\z})
 
-    return if valid
-
-    raise Exceptions::UnprocessableEntity, __('Each weight must be an integer greater than or equal to 0.')
+    nil
   end
-  private_class_method :validate_weights!
+  private_class_method :coerce_integer
 
-  def self.validate_ids!(model, ids)
-    ids = Array(ids).compact
+  def self.coerce_weights!(weights)
+    if !weights.respond_to?(:to_h) || weights.is_a?(Array)
+      raise Exceptions::UnprocessableEntity, __('Each weight must be an integer greater than or equal to 0.')
+    end
 
-    return if model.where(id: ids).count == ids.uniq.size
+    weights.to_h.to_h do |key, weight|
+      value = coerce_integer(weight)
+      raise Exceptions::UnprocessableEntity, __('Each weight must be an integer greater than or equal to 0.') if value.nil?
 
-    raise Exceptions::UnprocessableEntity, __('The selected record does not exist.')
+      [key.to_s, value]
+    end
   end
-  private_class_method :validate_ids!
+  private_class_method :coerce_weights!
+
+  def self.coerce_id!(model, value)
+    return if value.blank?
+
+    id = coerce_integer(value)
+    raise Exceptions::UnprocessableEntity, __('The selected record does not exist.') if id.nil? || !model.exists?(id)
+
+    id
+  end
+  private_class_method :coerce_id!
+
+  def self.coerce_ids!(model, values)
+    raise Exceptions::UnprocessableEntity, __('The selected record does not exist.') if !values.is_a?(Array)
+
+    values.compact_blank.map { |value| coerce_id!(model, value) }.uniq
+  end
+  private_class_method :coerce_ids!
 
   def initialize(state)
     @values = DEFAULTS.deep_dup.merge((state || {}).to_h.with_indifferent_access.slice(*DEFAULTS.keys))

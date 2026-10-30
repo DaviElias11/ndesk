@@ -111,6 +111,24 @@ RSpec.describe Ticket::Distribution::Config, :aggregate_failures do
         )
       end
 
+      it 'coerces digit strings to integers and clears blank dispatch values' do
+        group = create(:group)
+        state = Ticket::State.first
+        described_class.update!(dispatch_group_id: group.id.to_s, ignored_state_ids: [state.id.to_s, ''], weights: { 'facil' => '3' })
+
+        expect(described_class.current).to have_attributes(dispatch_group_id: group.id, ignored_state_ids: [state.id], weights: { 'facil' => 3 })
+
+        described_class.update!(dispatch_group_id: '')
+
+        expect(described_class.current.dispatch_group_id).to be_nil
+      end
+
+      it 'rejects non-numeric values and non-array id lists' do
+        expect { described_class.update!(dispatch_user_id: 'abc') }.to raise_error(Exceptions::UnprocessableEntity)
+        expect { described_class.update!(ignored_state_ids: 'abc') }.to raise_error(Exceptions::UnprocessableEntity)
+        expect { described_class.update!(weights: { 'facil' => 'abc' }) }.to raise_error(Exceptions::UnprocessableEntity)
+      end
+
       it 'replaces the whole weights hash' do
         described_class.update!(weights: { 'facil' => 2 })
 

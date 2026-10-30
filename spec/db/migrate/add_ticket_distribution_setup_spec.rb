@@ -15,7 +15,7 @@ RSpec.describe AddTicketDistributionSetup, :aggregate_failures, type: :db_migrat
     expect(Permission.exists?(name: 'admin.ticket_distribution')).to be(true)
     expect(Setting.get('ticket_distribution')).to include('complexity_attribute' => 'complexidades',
                                                           'weights'              => { 'facil' => 1, 'moderado' => 3, 'complexo' => 6 })
-    expect(ObjectManager::Attribute.get(object: 'User', name: 'discord_uid')).to be_present
+    expect(ObjectManager::Attribute.get(object: 'User', name: 'discord_uid')).to be_a(ObjectManager::Attribute)
     entry  = Trigger.find_by(name: 'Distribuição — Entrada')
     reopen = Trigger.find_by(name: 'Distribuição — Reabertura')
     expect([entry.active, reopen.active]).to eq([false, false])
