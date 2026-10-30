@@ -20,7 +20,15 @@ class TicketsMassController < ApplicationController
       return
     end
 
-    execute_transaction(@tickets) do |ticket|
+    missing_complexity = Ticket::Distribution::MacroGuard.tickets_missing_complexity(macro, @tickets)
+
+    if missing_complexity.any?
+      render_complexity_missing(missing_complexity)
+
+      return
+    end
+
+    execute_transaction(@tickets, macro:) do |ticket|
       ticket.screen = 'edit'
       ticket.perform_changes macro, 'macro', nil, current_user.id
     end
@@ -62,10 +70,25 @@ class TicketsMassController < ApplicationController
     clean_params
   end
 
-  def execute_transaction(tickets, &)
+  # Refused before the transaction, not by the action in the middle of it: the rollback would undo the writes of the
+  # previous tickets, but their events would stay in the EventBuffer and be dispatched by the next request of the thread.
+  def render_complexity_missing(tickets)
+    error = Ticket::Distribution::ComplexityMissingError.new
+
+    render json: {
+      error:                error.message,
+      error_human:          error.message,
+      unprocessable_entity: error.entity,
+      ticket_ids:           tickets.map(&:id),
+    }, status: :unprocessable_entity
+  end
+
+  def execute_transaction(tickets, macro: nil, &)
     failed_record = nil
 
     ActiveRecord::Base.transaction do
+      tickets = Ticket::Distribution::MacroGuard.lock_for(macro, tickets)
+
       tickets.each(&)
 
       assets = ApplicationModel::CanAssets.reduce tickets

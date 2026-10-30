@@ -229,6 +229,23 @@ RSpec.describe Gql::Mutations::Ticket::Update, :aggregate_failures, type: :graph
         end
       end
 
+      context 'with a ticket distribution macro', db_strategy: :reset do
+        include_context 'with ticket distribution complexity'
+
+        let(:ticket)    { create(:ticket, group:, customer:, owner: agent) }
+        let(:macro)     { create(:macro, perform: { 'distribution.ticket_distribution' => { 'value' => 'handover' } }) }
+        let(:variables) { { ticketId: gql.id(ticket), input: input_payload, meta: { macroId: gql.id(macro) } } }
+
+        before { create(:ticket_distribution_member, user: create(:agent, groups: [group])) }
+
+        it 'returns the message of the refusal and keeps the owner when the complexity is missing' do
+          gql.execute(query, variables:)
+
+          expect(gql.result.error_message).to eq('Fill in the complexity before handing over.')
+          expect(ticket.reload.owner_id).to eq(agent.id)
+        end
+      end
+
       context 'when moving the ticket into a group with only :change permission' do
         let(:group) { create(:group) }
 
