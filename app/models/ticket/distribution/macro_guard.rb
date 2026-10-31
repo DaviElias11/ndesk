@@ -9,14 +9,17 @@ module Ticket::Distribution::MacroGuard
     macro.present? && macro.perform.key?(ACTION)
   end
 
-  # The complexity the macro itself writes replaces the one of the ticket, also when it clears it.
-  def self.tickets_missing_complexity(macro, tickets)
+  # The complexity the macro itself writes replaces the one of the ticket, also when it clears it. So does the one in
+  # the input of the same request (the attributes assigned to each ticket before the macro runs), unless the macro writes one.
+  def self.tickets_missing_complexity(macro, tickets, input: {})
     return [] if !distributes?(macro) || macro.perform.dig(ACTION, 'value') != 'handover'
 
     config = Ticket::Distribution::Config.current
     return tickets.to_a if !config.complexity_attribute_present?
 
-    written = macro.perform["ticket.#{config.complexity_attribute}"]
+    attribute = config.complexity_attribute
+    input     = input.to_h.stringify_keys
+    written   = macro.perform["ticket.#{attribute}"] || (input.key?(attribute) ? { 'value' => input[attribute] } : nil)
 
     tickets.select { |ticket| (written ? written['value'] : config.complexity_of(ticket)).blank? }
   end
