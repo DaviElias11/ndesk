@@ -382,6 +382,57 @@ RSpec.describe Ticket::PerformChanges::Action::TicketDistribution, :aggregate_fa
       )
       expect(OnlineNotification.where(o_id: closed_ticket.id, type_lookup_id: TypeLookup.by_name('distribution_not_handed_over'))).to be_empty
     end
+
+    describe 'the locks (spec 5.6)' do
+      before { allow(Ticket::Distribution::Lock).to receive(:acquire!).and_call_original }
+
+      it 'takes no lock when an agent reopens' do
+        reopen(n2_b_user)
+
+        expect(Ticket::Distribution::Lock).not_to have_received(:acquire!)
+        expect(closed_ticket.reload.owner_id).to eq(n2_a_user.id)
+      end
+
+      it 'takes no lock when an agent closes a ticket' do
+        ticket = create(:ticket, group:, customer:, owner: n2_a_user, state: open_state, complexidades: 'moderado')
+        TransactionDispatcher.commit
+
+        ticket.update!(state: closed_state, updated_by_id: n2_b_user.id)
+        TransactionDispatcher.commit
+
+        expect(Ticket::Distribution::Lock).not_to have_received(:acquire!)
+        expect(ticket.reload.owner_id).to eq(n2_a_user.id)
+      end
+
+      it 'takes no lock when the system changes the state of a closed ticket, as a job does' do
+        reopen(User.find(1))
+
+        expect(Ticket::Distribution::Lock).not_to have_received(:acquire!)
+        expect(closed_ticket.reload.owner_id).to eq(n2_a_user.id)
+      end
+
+      it 'takes no lock when a customer moves a ticket that was not closed to open' do
+        pending_state = Ticket::State.find_by(name: 'pending reminder')
+        ticket        = create(:ticket, group:, customer:, owner: n2_a_user, state: pending_state, pending_time: 1.day.from_now, complexidades: 'moderado')
+        TransactionDispatcher.commit
+
+        ticket.update!(state: open_state, updated_by_id: customer.id)
+        TransactionDispatcher.commit
+
+        expect(Ticket::Distribution::Lock).not_to have_received(:acquire!)
+        expect(ticket.reload.owner_id).to eq(n2_a_user.id)
+      end
+
+      it 'locks and distributes when a customer really reopens' do
+        n2_a.update!(active: false)
+
+        reopen(customer)
+
+        expect(Ticket::Distribution::Lock).to have_received(:acquire!).with(closed_ticket.id).once
+        expect(closed_ticket.reload.owner_id).to eq(n2_b_user.id)
+        expect(n2_b.reload.last_assigned_at).to just_now
+      end
+    end
   end
 
   describe 'handover by trigger' do

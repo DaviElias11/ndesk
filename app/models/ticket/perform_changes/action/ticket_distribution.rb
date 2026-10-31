@@ -15,6 +15,10 @@ class Ticket::PerformChanges::Action::TicketDistribution < Ticket::PerformChange
       return false
     end
 
+    # Once on, the reopening trigger fires on every state change. The locks serialize decisions (spec 5.6): what will
+    # decide nothing cannot take them, or a job changing states would make all the others wait until its commit.
+    return false if mode == 'reopening' && !picker.reopening?(**reopening_context)
+
     return distribute_in_savepoint if origin != 'macro'
 
     refuse_without_complexity!
@@ -29,6 +33,14 @@ class Ticket::PerformChanges::Action::TicketDistribution < Ticket::PerformChange
 
   def config
     @config ||= Ticket::Distribution::Config.current
+  end
+
+  def picker
+    @picker ||= Ticket::Distribution::Picker.new(record, config:)
+  end
+
+  def reopening_context
+    { changes: context_data.try(:dig, :changes) || {}, author_id: user_id }
   end
 
   def refuse_without_complexity!
@@ -58,16 +70,14 @@ class Ticket::PerformChanges::Action::TicketDistribution < Ticket::PerformChange
   end
 
   def decision
-    picker = Ticket::Distribution::Picker.new(record, config:)
-
     case mode
     when 'entry'     then picker.entry
-    when 'handover'  then handover(picker)
-    when 'reopening' then picker.reopening(changes: context_data.try(:dig, :changes) || {}, author_id: user_id)
+    when 'handover'  then handover
+    when 'reopening' then picker.reopening(**reopening_context)
     end
   end
 
-  def handover(picker)
+  def handover
     decision = picker.handover(acting_user_id: user_id)
     return decision if decision.outcome != :complexity_missing
 

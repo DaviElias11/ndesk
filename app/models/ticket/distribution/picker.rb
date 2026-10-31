@@ -2,8 +2,6 @@
 
 # The decision rules of the N1/N2 distribution (entry, handover and reopening). Only reads: returns a Decision.
 class Ticket::Distribution::Picker
-  CLOSED_STATE_TYPES = %w[closed merged removed].freeze
-
   def initialize(ticket, config: Ticket::Distribution::Config.current)
     @ticket = ticket
     @config = config
@@ -31,8 +29,13 @@ class Ticket::Distribution::Picker
       decision(:not_handed_over, notices: [:not_handed_over], notify_user_id: acting_user_id)
   end
 
+  # Only reads, and takes no lock: tells whether #reopening has anything to decide, so the action can skip the locks.
+  def reopening?(changes:, author_id:)
+    reopened?(changes) && customer_action?(author_id)
+  end
+
   def reopening(changes:, author_id:)
-    return decision(:skipped) if !reopened?(changes) || !customer_action?(author_id)
+    return decision(:skipped) if !reopening?(changes:, author_id:)
 
     attended_by = User.find_by(id: changes['owner_id']&.first || @ticket.owner_id)
     if attended_by && may_stay?(attended_by)
@@ -96,7 +99,7 @@ class Ticket::Distribution::Picker
     old_id, new_id = changes['state_id']
     return false if old_id.nil? || new_id.nil?
 
-    state_type(old_id) == 'closed' && CLOSED_STATE_TYPES.exclude?(state_type(new_id))
+    state_type(old_id) == 'closed' && Ticket::Distribution::Load::CLOSED_STATE_TYPES.exclude?(state_type(new_id))
   end
 
   # true when the author is a customer-side actor (no ticket.agent and not the system user).

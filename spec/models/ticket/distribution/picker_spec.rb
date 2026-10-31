@@ -225,6 +225,18 @@ RSpec.describe Ticket::Distribution::Picker, :aggregate_failures, db_strategy: :
       picker(target).reopening(changes:, author_id:)
     end
 
+    describe '#reopening?' do
+      let(:reopened) { { 'state_id' => [closed.id, open_state.id] } }
+
+      it 'is true only for a closed ticket going to an open state by a customer-side author' do
+        expect(picker.reopening?(changes: reopened, author_id: customer.id)).to be(true)
+        expect(picker.reopening?(changes: reopened, author_id: n2_b_user.id)).to be(false)
+        expect(picker.reopening?(changes: reopened, author_id: 1)).to be(false)
+        expect(picker.reopening?(changes: {}, author_id: customer.id)).to be(false)
+        expect(picker.reopening?(changes: { 'state_id' => [open_state.id, closed.id] }, author_id: customer.id)).to be(false)
+      end
+    end
+
     it 'skips pending action to open' do
       pending_action = Ticket::State.find_by(name: 'pending close')
 
