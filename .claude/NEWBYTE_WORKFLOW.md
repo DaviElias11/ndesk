@@ -250,3 +250,73 @@ Arquivos modificados:
 - `docs/adr/0001-nchat-embed-frame-ancestors.md` (novo)
 - `docs/plans/2026-09-16-nchat-embed-frame-ancestors-design.md` e
   `docs/plans/2026-09-16-nchat-embed-frame-ancestors.md` (novos)
+
+### 2026-10-31 - branch feat/ticket-distribution (NDESK-70)
+
+**Branch**: `feat/ticket-distribution`
+
+Alteracoes:
+
+- **Distribuição de atendimentos N1/N2 no NDesk**: o NDesk passa a decidir o dono do ticket. Ticket novo vai
+  para o N1; a macro de análise prévia repassa ao N2 de menor carga (empate vai para quem está há mais tempo
+  sem receber); a reabertura pelo cliente volta para quem atendeu (ou outro N2 se ele estiver desligado). A
+  carga é calculada na hora (soma dos pontos dos tickets abertos), com pesos por complexidade, estados e
+  prioridades que não pesam, e grupo/responsável de Disparos. Ver `docs/distribuicao/CONTEXT.md` e as ADRs
+  em `docs/distribuicao/adr/`.
+- **Escala**: tabela `ticket_distribution_members` (modelo `Ticket::DistributionMember`, níveis `n1` e `n2`),
+  Setting `ticket_distribution`, permissão `admin.ticket_distribution` e atributo de usuário `discord_uid`
+  (ID do Discord, só dígitos), incluído no payload do webhook em `owner.discord_uid`. A escala acompanha a
+  exclusão do usuário.
+- **Ação de `perform_changes`** `distribution.ticket_distribution` (modos `entry`, `handover`, `reopening`),
+  na fase `before_save`, com trava (linhas do ticket por `id` crescente, depois advisory lock) e avisos.
+  Disponível no editor de macros e triggers, com o validador de `perform` ajustado.
+- **Recusa sem complexidade**: macro com a ação, aplicada a ticket sem complexidade, é recusada antes de
+  gravar (individual e em lote), com aviso fixo até ser fechado. Repasse não realizado grava nota interna do
+  Sistema e envia sino (`distribution_not_handed_over`) a quem aplicou, sem mudar o dono.
+- **Tela** `#manage/ticket_distribution` (admin clássico, CoffeeScript/Spine) e API REST
+  `/api/v1/ticket_distribution`: escala, carga de cada N2 e alertas.
+- **Triggers criados desligados**: `Distribuição — Entrada` e `Distribuição — Reabertura` nascem desligados
+  (migration e seeds). **A virada é manual (Task 12)**: depois do merge e do deploy, alguém com acesso ao n8n
+  liga os dois triggers e tira a atribuição do n8n. O código implantado não muda nada até lá.
+- Migrations: `20261028000001_create_ticket_distribution_members` e `20261028000002_add_ticket_distribution_setup`.
+- Catálogo de i18n regenerado; tradução pt-br em `i18n/zammad.pt-br.po`.
+
+Arquivos novos:
+
+- Modelos: `app/models/ticket/distribution_member.rb`, `app/models/user/ticket_distribution_membership.rb`,
+  `app/models/ticket/distribution/{complexity_missing_error,config,decision,eligibility,load,lock,macro_guard,notice,overview,picker,rotation}.rb`,
+  `app/models/ticket/perform_changes/action/ticket_distribution.rb`
+- Controller, policy e rota: `app/controllers/ticket_distribution_controller.rb`,
+  `app/policies/controllers/ticket_distribution_controller_policy.rb`, `config/routes/ticket_distribution.rb`
+- Migrations: `db/migrate/20261028000001_create_ticket_distribution_members.rb`,
+  `db/migrate/20261028000002_add_ticket_distribution_setup.rb`
+- Frontend clássico: `app/assets/javascripts/app/controllers/ticket_distribution.coffee`,
+  `app/assets/javascripts/app/views/ticket_distribution/{add_member,index,problems,weights}.jst.eco`
+- Docs: `docs/distribuicao/CONTEXT.md`, `docs/distribuicao/adr/0001` a `0004`,
+  `docs/distribuicao/pesquisa-load-balancer-atendimento.md`,
+  `docs/plans/2026-10-20-distribuicao-atendimentos.md` e `...-design.md`, `.newbyte/handoffs/NDESK-70.md`
+- Specs novos: `spec/models/ticket/distribution/*_spec.rb`, `spec/models/ticket/distribution_member_spec.rb`,
+  `spec/models/ticket/perform_changes/action/ticket_distribution_spec.rb`,
+  `spec/models/user/ticket_distribution_membership_spec.rb`, `spec/requests/ticket_distribution_spec.rb`,
+  `spec/requests/ticket_distribution_macro_spec.rb`, `spec/system/manage/ticket_distribution_spec.rb`,
+  `spec/system/ticket/zoom/distribution_refusal_spec.rb`, `spec/db/seeds/ticket_distribution_spec.rb`,
+  `spec/db/migrate/add_ticket_distribution_setup_spec.rb`, `spec/factories/ticket/distribution_member.rb`,
+  `spec/support/ticket_distribution.rb`
+
+Arquivos modificados:
+
+- App: `app/controllers/tickets_mass_controller.rb`, `app/models/ticket/perform_changes.rb`,
+  `app/models/user.rb`, `lib/validations/verify_perform_rules_validator.rb`
+- Seeds: `db/seeds/object_manager_attributes.rb`, `db/seeds/permissions.rb`, `db/seeds/settings.rb`,
+  `db/seeds/triggers.rb`
+- Frontend clássico: `app/assets/javascripts/app/controllers/_plugin/notify.coffee`,
+  `app/assets/javascripts/app/controllers/_ui_element/_application_action.coffee`,
+  `app/assets/javascripts/app/controllers/ticket_zoom.coffee`,
+  `app/assets/javascripts/app/lib/mixins/ticket_mass_updatable.coffee`,
+  `app/assets/javascripts/app/models/{macro,ticket,trigger}.coffee`, `app/assets/stylesheets/zammad.scss`
+- i18n: `i18n/zammad.pot`, `i18n/zammad.pt-br.po`
+- QUnit: `public/assets/tests/qunit/form_ticket_perform_action.js`, `public/assets/tests/qunit/ticket_macro.js`
+- Specs modificados: `spec/graphql/gql/mutations/ticket/update_spec.rb`,
+  `spec/jobs/trigger_webhook_job/record_payload/ticket_spec.rb`,
+  `spec/lib/validations/verify_perform_rules_validator_spec.rb`, `spec/models/system_report_spec.rb`,
+  `spec/models/user_spec.rb`
