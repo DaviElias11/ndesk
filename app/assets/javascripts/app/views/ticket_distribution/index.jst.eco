@@ -124,6 +124,9 @@
         <div class="controls controls--select">
           <select class="form-control" id="ticket_distribution_dispatch_group" name="dispatch_group_id">
             <option value="">-</option>
+            <% if @overview.dispatch.group_id and !_.findWhere(@overview.options.groups, id: @overview.dispatch.group_id): %>
+              <option value="<%= @overview.dispatch.group_id %>" selected><%- @T('Unavailable (ID %s)', @overview.dispatch.group_id) %></option>
+            <% end %>
             <% for group in @overview.options.groups: %>
               <option value="<%= group.id %>" <% if group.id is @overview.dispatch.group_id: %>selected<% end %>><%= group.name %></option>
             <% end %>
@@ -136,6 +139,9 @@
         <div class="controls controls--select">
           <select class="form-control" id="ticket_distribution_dispatch_user" name="dispatch_user_id">
             <option value="">-</option>
+            <% if @overview.dispatch.user_id and !_.findWhere(@overview.options.agents, id: @overview.dispatch.user_id): %>
+              <option value="<%= @overview.dispatch.user_id %>" selected><%- @T('Unavailable (ID %s)', @overview.dispatch.user_id) %></option>
+            <% end %>
             <% for agent in @overview.options.agents: %>
               <option value="<%= agent.id %>" <% if agent.id is @overview.dispatch.user_id: %>selected<% end %>><%= agent.name %></option>
             <% end %>

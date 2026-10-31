@@ -28040,3 +28040,6 @@ msgstr "Tickets que pesam"
 
 msgid "Who receives the new tickets (N1), who receives the handovers (N2) and how the load of each one is counted."
 msgstr "Quem recebe os tickets novos (N1), quem recebe os repasses (N2) e como a carga de cada um é contada."
+
+msgid "Unavailable (ID %s)"
+msgstr "Indisponível (ID %s)"

@@ -3505,7 +3505,7 @@ msgstr ""
 msgid "Completed Tasks"
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:158
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:164
 msgid "Complexity attribute"
 msgstr ""
 
@@ -8244,7 +8244,7 @@ msgstr ""
 msgid "How many of your tickets have been re-opened after being marked “closed”?"
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:153
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:159
 msgid "How the load is counted"
 msgstr ""
 
@@ -12787,7 +12787,7 @@ msgstr ""
 msgid "Please wait…"
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:172
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:178
 msgid "Points per value"
 msgstr ""
 
@@ -12941,7 +12941,7 @@ msgstr ""
 msgid "Prio"
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:182
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:188
 msgid "Priorities that do not count"
 msgstr ""
 
@@ -13722,7 +13722,7 @@ msgstr ""
 msgid "Response"
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:135
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:138
 msgid "Responsible"
 msgstr ""
 
@@ -15507,7 +15507,7 @@ msgstr ""
 msgid "State icon"
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:178
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:184
 msgid "States that do not count"
 msgstr ""
 
@@ -17085,7 +17085,7 @@ msgstr ""
 msgid "The structure is a JSON object that defines the result format to be returned by the AI agent."
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:154
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:160
 msgid "The sum of the points of the open tickets of the agent. A ticket without complexity counts as 0."
 msgstr ""
 
@@ -18912,6 +18912,10 @@ msgstr ""
 #: app/assets/javascripts/app/views/microsoft365/list.jst.eco:17
 #: app/assets/javascripts/app/views/microsoft_graph/list.jst.eco:17
 msgid "Unassigned email addresses, assign them to a channel or delete them."
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:128
+msgid "Unavailable (ID %s)"
 msgstr ""
 
 #: app/assets/javascripts/app/views/ticket_zoom/sidebar_checklist/show_row.jst.eco:26

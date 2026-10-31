@@ -207,6 +207,45 @@ RSpec.describe 'Manage > Ticket Distribution', :aggregate_failures, authenticate
       wait.until { Ticket::Distribution::Config.current.dispatch_user_id.nil? }
       expect(Ticket::Distribution::Config.current.dispatch_group_id).to eq(group.id)
     end
+
+    it 'keeps an inactive group when another field is saved, until the empty option is picked' do
+      inactive_group = create(:group, active: false)
+      Ticket::Distribution::Config.update!(dispatch_group_id: inactive_group.id)
+
+      visit 'manage/ticket_distribution'
+
+      expect(find('.js-dispatch select[name="dispatch_group_id"]').value).to eq(inactive_group.id.to_s)
+      expect(page).to have_select('dispatch_group_id', selected: "Unavailable (ID #{inactive_group.id})")
+
+      find('.js-dispatch select[name="dispatch_user_id"]').select(n2_on.fullname)
+      click '.js-saveDispatch'
+
+      wait.until { Ticket::Distribution::Config.current.dispatch_user_id == n2_on.id }
+      expect(Ticket::Distribution::Config.current.dispatch_group_id).to eq(inactive_group.id)
+      expect(page).to have_select('dispatch_group_id', selected: "Unavailable (ID #{inactive_group.id})")
+
+      find('.js-dispatch select[name="dispatch_group_id"]').select('-')
+      click '.js-saveDispatch'
+
+      wait.until { Ticket::Distribution::Config.current.dispatch_group_id.nil? }
+      expect(Ticket::Distribution::Config.current.dispatch_user_id).to eq(n2_on.id)
+    end
+
+    it 'keeps an inactive responsible when another field is saved' do
+      inactive_agent = create(:agent, active: false, groups: [group])
+      Ticket::Distribution::Config.update!(dispatch_user_id: inactive_agent.id)
+
+      visit 'manage/ticket_distribution'
+
+      expect(page).to have_select('dispatch_user_id', selected: "Unavailable (ID #{inactive_agent.id})")
+      expect(page).to have_css('.js-dispatch .js-problems', text: 'Inactive user')
+
+      find('.js-dispatch select[name="dispatch_group_id"]').select(group.name)
+      click '.js-saveDispatch'
+
+      wait.until { Ticket::Distribution::Config.current.dispatch_group_id == group.id }
+      expect(Ticket::Distribution::Config.current.dispatch_user_id).to eq(inactive_agent.id)
+    end
   end
 
   describe 'the alerts' do
