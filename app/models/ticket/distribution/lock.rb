@@ -9,7 +9,7 @@ module Ticket::Distribution::Lock
 
   def self.acquire!(ticket_id)
     Ticket.where(id: ticket_id).lock.pluck(:id)
-    ActiveRecord::Base.connection.execute("SELECT pg_advisory_xact_lock(#{KEY})")
+    ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql_array(['SELECT pg_advisory_xact_lock(?)', KEY]))
 
     nil
   end
