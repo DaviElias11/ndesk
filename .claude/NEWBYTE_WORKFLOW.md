@@ -293,7 +293,7 @@ Arquivos novos:
 - Frontend clássico: `app/assets/javascripts/app/controllers/ticket_distribution.coffee`,
   `app/assets/javascripts/app/views/ticket_distribution/{add_member,index,problems,weights}.jst.eco`
 - Docs: `docs/distribuicao/CONTEXT.md`, `docs/distribuicao/adr/0001` a `0004`,
-  `docs/distribuicao/pesquisa-load-balancer-atendimento.md`,
+  `docs/pesquisas/pesquisa-load-balancer-atendimento.md`,
   `docs/plans/2026-10-20-distribuicao-atendimentos.md` e `...-design.md`, `.newbyte/handoffs/NDESK-70.md`
 - Specs novos: `spec/models/ticket/distribution/*_spec.rb`, `spec/models/ticket/distribution_member_spec.rb`,
   `spec/models/ticket/perform_changes/action/ticket_distribution_spec.rb`,
