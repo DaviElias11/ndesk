@@ -1218,6 +1218,14 @@ msgstr ""
 msgid "Add all values"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:48
+msgid "Add an agent to N1…"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:105
+msgid "Add an agent to N2…"
+msgstr ""
+
 #: app/assets/javascripts/app/views/channel/form.jst.eco:112
 msgid "Add attachment option to upload."
 msgstr ""
@@ -3497,6 +3505,10 @@ msgstr ""
 msgid "Completed Tasks"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:158
+msgid "Complexity attribute"
+msgstr ""
+
 #: public/assets/chat/views/chat.eco:24
 msgid "Compose your message…"
 msgstr ""
@@ -3535,6 +3547,10 @@ msgstr ""
 
 #: app/models/system_report/plugin/environment.rb:4
 msgid "Configuration of performance settings via environment variables."
+msgstr ""
+
+#: db/seeds/settings.rb:6251
+msgid "Configuration of the N1/N2 ticket distribution."
 msgstr ""
 
 #: app/assets/javascripts/app/views/integration/exchange.jst.eco:25
@@ -5724,12 +5740,21 @@ msgstr ""
 msgid "Discard your unsaved changes."
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:64
+#: db/seeds/object_manager_attributes.rb:1921
+msgid "Discord ID"
+msgstr ""
+
 #: lib/excel_sheet/ai/analytics/with_usage.rb:44
 msgid "Dislikes count"
 msgstr ""
 
 #: app/frontend/shared/components/CommonAlert/CommonAlert.vue:61
 msgid "Dismiss alert"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:118
+msgid "Dispatches and campaigns"
 msgstr ""
 
 #: app/assets/javascripts/app/models/object_manager_attribute.coffee:7
@@ -5751,6 +5776,14 @@ msgstr ""
 #: app/assets/javascripts/app/models/email_address.coffee:32
 #: db/seeds/settings.rb:1894
 msgid "Display name"
+msgstr ""
+
+#: db/seeds/triggers.rb:121
+msgid "Distribuição — Entrada"
+msgstr ""
+
+#: db/seeds/triggers.rb:132
+msgid "Distribuição — Reabertura"
 msgstr ""
 
 #: app/frontend/apps/desktop/pages/personal-setting/views/PersonalSettingNewBetaUi.vue:88
@@ -5966,6 +5999,10 @@ msgstr ""
 
 #: app/frontend/apps/desktop/pages/guided-setup/components/GuidedSetupImport/GuidedSetupImportSource/plugins/otrs.ts:25
 msgid "Dynamic fields are not that common in Zammad, as it takes a different approach to ticket attributes. Zammad also uses tags in addition to custom fields to classify tickets. This difference can create a new philosophy of your ticket attributes/tags compared to your current use of dynamic fields in OTRS."
+msgstr ""
+
+#: app/models/ticket/distribution/config.rb:72
+msgid "Each weight must be an integer greater than or equal to 0."
 msgstr ""
 
 #: app/assets/javascripts/app/models/user.coffee:334
@@ -6701,6 +6738,10 @@ msgstr ""
 msgid "Entity counts of database objects (e.g. ticket count, user count, etc.)"
 msgstr ""
 
+#: app/assets/javascripts/app/controllers/_ui_element/_application_action.coffee:147
+msgid "Entry (N1)"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/_application_controller/_modal_generic_error_modal.coffee:6
 #: app/assets/javascripts/app/controllers/_profile/out_of_office.coffee:165
 #: app/assets/javascripts/app/controllers/_settings/area_proxy.coffee:51
@@ -6803,6 +6844,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/models/knowledge_base.coffee:271
 msgid "Every category in your knowledge base should be given a unique icon for maximum visual clarity. Each set below provides a wide range of icons to choose from, but beware: You can't mix and match different icons from different sets. Choose carefully!"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:18
+msgid "Every new ticket lands here. With more than one person, the one who has gone the longest without receiving gets it."
 msgstr ""
 
 #: app/assets/javascripts/app/models/trigger.coffee
@@ -7128,6 +7173,10 @@ msgstr ""
 #: app/assets/javascripts/app/views/settings/storage_provider.jst.eco:5
 #: db/seeds/settings.rb:378
 msgid "Filesystem"
+msgstr ""
+
+#: app/models/ticket/distribution/complexity_missing_error.rb:8
+msgid "Fill in the complexity before handing over."
 msgstr ""
 
 #: app/assets/javascripts/app/controllers/_channel/email.coffee:16
@@ -7905,6 +7954,10 @@ msgstr ""
 msgid "HTTP type"
 msgstr ""
 
+#: app/assets/javascripts/app/controllers/_ui_element/_application_action.coffee:148
+msgid "Hand over to N2"
+msgstr ""
+
 #: db/seeds/schedulers.rb:214
 msgid "Handle data privacy tasks."
 msgstr ""
@@ -8191,6 +8244,10 @@ msgstr ""
 msgid "How many of your tickets have been re-opened after being marked “closed”?"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:153
+msgid "How the load is counted"
+msgstr ""
+
 #: app/controllers/first_steps_controller.rb:74
 msgid "How to use it"
 msgstr ""
@@ -8260,6 +8317,10 @@ msgstr ""
 
 #: app/frontend/apps/desktop/pages/ticket/components/TicketSidebar/TicketSidebarExternalReferences/TicketSidebarIdoit/IdoitFlyout/IdoitObjectList.vue:29
 msgid "Idoit objects"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:109
+msgid "If a handover happened now, it would go to %s"
 msgstr ""
 
 #: app/assets/javascripts/app/controllers/_integration/ldap.coffee:6
@@ -8476,8 +8537,17 @@ msgstr ""
 msgid "In order to be able to influence the desired behavior in this regard, you can influence the order of the LDAP sources via drag & drop."
 msgstr ""
 
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:154
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:59
+msgid "In rotation"
+msgstr ""
+
 #: app/frontend/apps/desktop/pages/personal-setting/views/PersonalSettingOutOfOffice.vue:73
 msgid "Inactive"
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:159
+msgid "Inactive user"
 msgstr ""
 
 #: app/assets/javascripts/app/views/channel/email_account_overview.jst.eco:60
@@ -9252,6 +9322,10 @@ msgstr ""
 msgid "Last created at of database objects (e.g. when was the last trigger created)"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:63
+msgid "Last handover"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/_ui_element/object_selector.coffee:224
 msgid "Last login"
 msgstr ""
@@ -9277,6 +9351,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/views/calendar/index.jst.eco:25
 msgid "Last sync at:"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:28
+msgid "Last ticket received"
 msgstr ""
 
 #: app/assets/javascripts/app/views/profile/token_access.jst.eco:20
@@ -9326,6 +9404,10 @@ msgstr ""
 #: app/assets/javascripts/app/views/profile/appearance.jst.eco:26
 #: app/frontend/apps/desktop/pages/personal-setting/views/PersonalSettingAppearance.vue:43
 msgid "Light"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:119
+msgid "Like every ticket, it enters through N1. On handover, it goes to the responsible agent instead of the N2 rotation."
 msgstr ""
 
 #: lib/excel_sheet/ai/analytics/with_usage.rb:43
@@ -9523,6 +9605,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/views/channel/chat.jst.eco:38
 msgid "Load"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:61
+msgid "Load (points)"
 msgstr ""
 
 #: app/frontend/shared/form/i18n/locales.ts:61
@@ -9915,6 +10001,10 @@ msgstr ""
 
 #: db/seeds/permissions.rb:42
 msgid "Manage text modules of your system."
+msgstr ""
+
+#: db/seeds/permissions.rb:556
+msgid "Manage the N1/N2 ticket distribution."
 msgstr ""
 
 #: db/seeds/permissions.rb:222
@@ -10527,6 +10617,18 @@ msgstr ""
 msgid "My tickets in process"
 msgstr ""
 
+#: app/controllers/ticket_distribution_controller.rb:22
+msgid "N1 agents have no switch."
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:17
+msgid "N1 · Entry"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:52
+msgid "N2 · Handover"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/_integration/nagios.coffee:3
 msgid "Nagios"
 msgstr ""
@@ -10677,6 +10779,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/controllers/_manage/system.coffee:15
 msgid "Network"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:40
+msgid "Never"
 msgstr ""
 
 #: app/frontend/apps/desktop/components/BetaUi/FeedbackDialog/FeedbackDialog.vue:66
@@ -11006,12 +11112,28 @@ msgstr ""
 msgid "No Facebook app configured!"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:96
+msgid "No ID"
+msgstr ""
+
 #: lib/external_credential/microsoft365.rb:9
 msgid "No Microsoft 365 app configured!"
 msgstr ""
 
 #: lib/external_credential/microsoft_graph.rb:9
 msgid "No Microsoft Graph app configured!"
+msgstr ""
+
+#: app/models/ticket/distribution/notice.rb:25
+msgid "No N1 agent can own tickets of this group."
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:21
+msgid "No N1 agent registered"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:111
+msgid "No N2 agent in the rotation right now."
 msgstr ""
 
 #: db/seeds/settings.rb:577
@@ -11027,6 +11149,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/controllers/_plugin/translation_support.coffee:37
 msgid "No Thanks!"
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:161
+msgid "No access to: %s"
 msgstr ""
 
 #: app/frontend/shared/entities/ticket-article/action/plugins/whatsapp.ts:112
@@ -11312,6 +11438,10 @@ msgstr ""
 
 #: app/policies/controllers/taskbar_controller_policy.rb:35
 msgid "Not allowed to access this task."
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:160
+msgid "Not an agent (no ticket.agent permission)"
 msgstr ""
 
 #: app/assets/javascripts/app/views/object_manager/screens.jst.eco:29
@@ -11601,6 +11731,10 @@ msgstr ""
 
 #: public/assets/chat/chat.coffee:206
 msgid "Offline"
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:153
+msgid "Offline · still in rotation"
 msgstr ""
 
 #: app/assets/javascripts/app/controllers/knowledge_base/delete_action.coffee:40
@@ -12045,6 +12179,10 @@ msgstr ""
 
 #: app/frontend/apps/desktop/pages/personal-setting/views/PersonalSettingOutOfOffice.vue:143
 msgid "Out of office settings have been saved successfully"
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:152
+msgid "Out of office until %s"
 msgstr ""
 
 #: app/assets/javascripts/app/views/channel/email_account_overview.jst.eco:99
@@ -12649,6 +12787,10 @@ msgstr ""
 msgid "Please wait…"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:172
+msgid "Points per value"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/_channel/email.coffee:421
 #: app/assets/javascripts/app/controllers/getting_started/channel_email.coffee:85
 #: app/assets/javascripts/app/controllers/getting_started/email_notification.coffee:72
@@ -12797,6 +12939,10 @@ msgstr ""
 #: app/assets/javascripts/app/models/public_link.coffee:11
 #: app/assets/javascripts/app/models/user_overview_sorting.coffee:8
 msgid "Prio"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:182
+msgid "Priorities that do not count"
 msgstr ""
 
 #: app/assets/javascripts/app/controllers/_application_controller/form.coffee:225
@@ -13052,6 +13198,10 @@ msgstr ""
 
 #: app/frontend/shared/entities/ticket/composables/useTicketCreateArticleType.ts:15
 msgid "Received call: %s"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:53
+msgid "Receives the tickets of the preliminary analysis macro. It goes to the lowest load; on a tie, to the one who has gone the longest without receiving. Offline keeps receiving; out of office and the switch off take the agent out of the rotation."
 msgstr ""
 
 #: app/assets/javascripts/app/views/agent_ticket_merge.jst.eco:5
@@ -13359,6 +13509,10 @@ msgstr ""
 msgid "Reopened"
 msgstr ""
 
+#: app/assets/javascripts/app/controllers/_ui_element/_application_action.coffee:149
+msgid "Reopening"
+msgstr ""
+
 #: app/assets/javascripts/app/views/dashboard/stats/ticket_reopen.jst.eco:3
 msgid "Reopening rate"
 msgstr ""
@@ -13566,6 +13720,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/views/widget/http_log_show.jst.eco:20
 msgid "Response"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:135
+msgid "Responsible"
 msgstr ""
 
 #: app/assets/javascripts/app/views/monitoring.jst.eco:56
@@ -15104,6 +15262,10 @@ msgstr ""
 msgid "Site"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:60
+msgid "Situation"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/_channel/email_archive.coffee:9
 #: app/assets/javascripts/app/controllers/ticket_zoom/time_accounting_modal.coffee:10
 #: app/assets/javascripts/app/views/channel/email_account_wizard.jst.eco:127
@@ -15343,6 +15505,10 @@ msgstr ""
 
 #: app/frontend/apps/desktop/components/Ticket/TicketListTable.vue:91
 msgid "State icon"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:178
+msgid "States that do not count"
 msgstr ""
 
 #: db/seeds/settings.rb:5466
@@ -15589,6 +15755,10 @@ msgstr ""
 
 #: app/frontend/apps/desktop/pages/authentication/views/Login.vue:322
 msgid "Switch to old interface"
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:151
+msgid "Switched off"
 msgstr ""
 
 #: db/seeds/schedulers.rb:133
@@ -16188,6 +16358,14 @@ msgstr ""
 msgid "The chosen unit will be used for display only and will not affect stored values."
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:12
+msgid "The complexity attribute is not available: handovers are refused until another one is selected."
+msgstr ""
+
+#: app/models/ticket/distribution/config.rb:58
+msgid "The complexity attribute must be an active select attribute of tickets."
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/_plugin/maintenance.coffee:96
 msgid "The configuration of Zammad has changed, please reload your browser."
 msgstr ""
@@ -16439,6 +16617,10 @@ msgstr ""
 
 #: app/frontend/shared/composables/useLocaleUpdate.ts:21
 msgid "The language could not be updated."
+msgstr ""
+
+#: app/controllers/ticket_distribution_controller.rb:32
+msgid "The last N1 agent cannot be removed."
 msgstr ""
 
 #: app/models/setting/validation/saml/security.rb:44
@@ -16826,6 +17008,10 @@ msgstr ""
 msgid "The selected date is invalid."
 msgstr ""
 
+#: app/models/ticket/distribution/config.rb:88
+msgid "The selected record does not exist."
+msgstr ""
+
 #: app/services/service/system/import/apply_configuration_base.rb:40
 msgid "The server presented a certificate that could not be verified."
 msgstr ""
@@ -16899,6 +17085,10 @@ msgstr ""
 msgid "The structure is a JSON object that defines the result format to be returned by the AI agent."
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:154
+msgid "The sum of the points of the open tickets of the agent. A ticket without complexity counts as 0."
+msgstr ""
+
 #: app/assets/javascripts/app/views/ticket_zoom/sidebar_ticket_summary.jst.eco:5
 #: app/frontend/apps/desktop/pages/ticket/components/TicketSidebar/TicketSidebarSummary/TicketSidebarSummaryContent.vue:81
 msgid "The summary could not be generated. Please try again later or contact your administrator."
@@ -16954,6 +17144,10 @@ msgstr ""
 
 #: app/services/service/ticket/update/validator/checklist_completed.rb:17
 msgid "The ticket checklist is incomplete."
+msgstr ""
+
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:141
+msgid "The ticket distribution could not be updated."
 msgstr ""
 
 #: app/services/service/ticket/update/validator/time_accounting.rb:19
@@ -17537,6 +17731,10 @@ msgstr ""
 msgid "This permission level is not available based on the current roles permissions."
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:113
+msgid "This preview does not consider the group of the ticket or the dispatches and campaigns."
+msgstr ""
+
 #: app/services/service/execute_locked_block.rb:44
 msgid "This resource cannot be locked, because it has already been locked by another process."
 msgstr ""
@@ -17714,6 +17912,13 @@ msgstr ""
 msgid "Ticket Customer"
 msgstr ""
 
+#: app/assets/javascripts/app/controllers/_ui_element/_application_action.coffee:73
+#: app/assets/javascripts/app/controllers/ticket_distribution.coffee:3
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:3
+#: db/seeds/permissions.rb:555
+msgid "Ticket Distribution"
+msgstr ""
+
 #: db/seeds/permissions.rb:227
 msgid "Ticket Duplicate Detection"
 msgstr ""
@@ -17859,6 +18064,10 @@ msgstr ""
 msgid "Ticket customer updated successfully."
 msgstr ""
 
+#: db/seeds/settings.rb:6248
+msgid "Ticket distribution"
+msgstr ""
+
 #: app/assets/javascripts/app/controllers/_profile/notification.coffee:71
 #: app/assets/javascripts/app/controllers/_ui_element/notification_matrix.coffee:13
 #: app/frontend/apps/desktop/components/Form/fields/FieldNotifications/FieldNotificationsInput.vue:89
@@ -18002,6 +18211,10 @@ msgstr ""
 msgid "Ticket |%s| was merged into another ticket"
 msgstr ""
 
+#: app/assets/javascripts/app/models/ticket.coffee:119
+msgid "Ticket |%s| was not handed over: no N2 agent in the rotation"
+msgstr ""
+
 #: app/assets/javascripts/app/models/ticket.coffee:117
 #: app/frontend/shared/composables/activity-message/activityMessageBuilder/builders/ticket.ts:29
 msgid "Ticket |%s| will escalate soon!"
@@ -18064,6 +18277,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/views/widget/ticket_stats.jst.eco:3
 msgid "Tickets of User"
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:62
+msgid "Tickets that count"
 msgstr ""
 
 #: app/frontend/apps/mobile/pages/search/plugins/ticket.ts:10
@@ -19693,6 +19910,10 @@ msgstr ""
 
 #: app/assets/javascripts/app/controllers/_channel/chat.coffee:49
 msgid "Where to append the chat to."
+msgstr ""
+
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:8
+msgid "Who receives the new tickets (N1), who receives the handovers (N2) and how the load of each one is counted."
 msgstr ""
 
 #: app/assets/javascripts/app/views/channel/chat.jst.eco:209
@@ -21952,6 +22173,10 @@ msgid "How do you rate the resolution of your problem?"
 msgstr ""
 
 msgid "How do you rate the service?"
+msgstr ""
+
+#: app/models/ticket/distribution/notice.rb:9
+msgid "Not handed over: no N2 agent in the rotation."
 msgstr ""
 
 msgid "Not now"

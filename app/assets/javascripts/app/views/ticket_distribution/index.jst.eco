@@ -1,0 +1,188 @@
+<div class="page-header">
+  <div class="page-header-title">
+    <h1><%- @T('Ticket Distribution') %></h1>
+  </div>
+</div>
+
+<div class="page-content ticket-distribution">
+  <p class="help-text"><%- @T('Who receives the new tickets (N1), who receives the handovers (N2) and how the load of each one is counted.') %></p>
+
+  <div class="js-configAlerts">
+    <% if _.contains(@overview.config_alerts, 'complexity_attribute_missing'): %>
+      <div class="alert alert--danger" role="alert"><%- @T('The complexity attribute is not available: handovers are refused until another one is selected.') %></div>
+    <% end %>
+  </div>
+
+  <section class="settings-entry settings-entry--stretched">
+    <h2><%- @T('N1 · Entry') %></h2>
+    <p class="help-text"><%- @T('Every new ticket lands here. With more than one person, the one who has gone the longest without receiving gets it.') %></p>
+
+    <% if @overview.n1_empty: %>
+      <div class="alert alert--danger" role="alert"><%- @T('No N1 agent registered') %></div>
+    <% end %>
+
+    <table class="settings-list settings-list--stretch js-members" data-level="n1">
+      <thead>
+        <tr>
+          <th><%- @T('Agent') %></th>
+          <th><%- @T('Last ticket received') %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for member in @overview.n1: %>
+          <tr data-user-id="<%= member.user_id %>">
+            <td>
+              <b><%= member.name %></b>
+              <%- App.view('ticket_distribution/problems')(messages: @problemMessages(member.problems)) %>
+            </td>
+            <td>
+              <% if member.last_assigned_at: %><%- @humanTime(member.last_assigned_at) %><% else: %><%- @T('Never') %><% end %>
+            </td>
+            <td class="settings-list-action-cell js-removeMember" data-member-id="<%= member.id %>" title="<%- @Ti('Remove') %>"><%- @Icon('trash') %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%- App.view('ticket_distribution/add_member')(level: 'n1', agents: @n1Options, placeholder: App.i18n.translatePlain('Add an agent to N1…')) %>
+  </section>
+
+  <section class="settings-entry settings-entry--stretched">
+    <h2><%- @T('N2 · Handover') %></h2>
+    <p class="help-text"><%- @T('Receives the tickets of the preliminary analysis macro. It goes to the lowest load; on a tie, to the one who has gone the longest without receiving. Offline keeps receiving; out of office and the switch off take the agent out of the rotation.') %></p>
+
+    <table class="settings-list settings-list--stretch js-members" data-level="n2">
+      <thead>
+        <tr>
+          <th><%- @T('Agent') %></th>
+          <th><%- @T('In rotation') %></th>
+          <th><%- @T('Situation') %></th>
+          <th><%- @T('Load (points)') %></th>
+          <th><%- @T('Tickets that count') %></th>
+          <th><%- @T('Last handover') %></th>
+          <th><%- @T('Discord ID') %></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for member in @overview.n2: %>
+          <tr data-user-id="<%= member.user_id %>">
+            <td>
+              <b><%= member.name %></b>
+              <%- App.view('ticket_distribution/problems')(messages: @problemMessages(member.problems)) %>
+            </td>
+            <td>
+              <div class="zammad-switch zammad-switch--small">
+                <input class="js-memberActive" type="checkbox" id="ticket_distribution_member_<%= member.id %>" data-member-id="<%= member.id %>" <% if member.active: %>checked<% end %>>
+                <label for="ticket_distribution_member_<%= member.id %>"></label>
+              </div>
+            </td>
+            <td>
+              <span class="ticket-distribution__pill ticket-distribution__pill--<%= member.situation %> js-situation"><%= @situationLabel(member) %></span>
+            </td>
+            <td class="ticket-distribution__load">
+              <span class="ticket-distribution__bar"><span class="ticket-distribution__bar-fill" style="width: <%= Math.round(member.points / @maxPoints * 100) %>%"></span></span>
+              <b class="js-points"><%= member.points %></b>
+            </td>
+            <td class="js-tickets"><%= member.tickets %></td>
+            <td>
+              <% if member.last_assigned_at: %><%- @humanTime(member.last_assigned_at) %><% else: %><%- @T('Never') %><% end %>
+            </td>
+            <td class="js-discord">
+              <% if member.discord_uid_present: %>
+                <span class="ticket-distribution__pill ticket-distribution__pill--ok"><%- @T('OK') %></span>
+              <% else: %>
+                <span class="ticket-distribution__pill ticket-distribution__pill--warning"><%- @T('No ID') %></span>
+              <% end %>
+            </td>
+            <td class="settings-list-action-cell js-removeMember" data-member-id="<%= member.id %>" title="<%- @Ti('Remove') %>"><%- @Icon('trash') %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%- App.view('ticket_distribution/add_member')(level: 'n2', agents: @n2Options, placeholder: App.i18n.translatePlain('Add an agent to N2…')) %>
+
+    <div class="ticket-distribution__preview js-preview">
+      <% if @previewMember: %>
+        <%- @T('If a handover happened now, it would go to %s', @previewMember.name) %>
+      <% else: %>
+        <%- @T('No N2 agent in the rotation right now.') %>
+      <% end %>
+      <div class="help-text"><%- @T('This preview does not consider the group of the ticket or the dispatches and campaigns.') %></div>
+    </div>
+  </section>
+
+  <form class="settings-entry settings-entry--stretched js-dispatch">
+    <h2><%- @T('Dispatches and campaigns') %></h2>
+    <p class="help-text"><%- @T('Like every ticket, it enters through N1. On handover, it goes to the responsible agent instead of the N2 rotation.') %></p>
+
+    <div class="ticket-distribution__fields">
+      <div class="form-group">
+        <label class="label" for="ticket_distribution_dispatch_group"><%- @T('Group') %></label>
+        <div class="controls controls--select">
+          <select class="form-control" id="ticket_distribution_dispatch_group" name="dispatch_group_id">
+            <option value="">-</option>
+            <% for group in @overview.options.groups: %>
+              <option value="<%= group.id %>" <% if group.id is @overview.dispatch.group_id: %>selected<% end %>><%= group.name %></option>
+            <% end %>
+          </select>
+          <%- @Icon('arrow-down') %>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="label" for="ticket_distribution_dispatch_user"><%- @T('Responsible') %></label>
+        <div class="controls controls--select">
+          <select class="form-control" id="ticket_distribution_dispatch_user" name="dispatch_user_id">
+            <option value="">-</option>
+            <% for agent in @overview.options.agents: %>
+              <option value="<%= agent.id %>" <% if agent.id is @overview.dispatch.user_id: %>selected<% end %>><%= agent.name %></option>
+            <% end %>
+          </select>
+          <%- @Icon('arrow-down') %>
+        </div>
+        <%- App.view('ticket_distribution/problems')(messages: @problemMessages(@overview.dispatch.problems)) %>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn--primary js-saveDispatch"><%- @T('Save') %></button>
+  </form>
+
+  <form class="settings-entry settings-entry--stretched js-load">
+    <h2><%- @T('How the load is counted') %></h2>
+    <p class="help-text"><%- @T('The sum of the points of the open tickets of the agent. A ticket without complexity counts as 0.') %></p>
+
+    <div class="ticket-distribution__fields">
+      <div class="form-group">
+        <label class="label" for="ticket_distribution_complexity_attribute"><%- @T('Complexity attribute') %></label>
+        <div class="controls controls--select">
+          <select class="form-control js-complexityAttribute" id="ticket_distribution_complexity_attribute">
+            <% if !_.findWhere(@overview.options.complexity_attributes, name: @overview.config.complexity_attribute): %>
+              <option value="" selected>-</option>
+            <% end %>
+            <% for attribute in @overview.options.complexity_attributes: %>
+              <option value="<%= attribute.name %>" <% if attribute.name is @overview.config.complexity_attribute: %>selected<% end %>><%- @T(attribute.display) %></option>
+            <% end %>
+          </select>
+          <%- @Icon('arrow-down') %>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label"><%- @T('Points per value') %></div>
+        <div class="ticket-distribution__weights js-weights"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="label"><%- @T('States that do not count') %></div>
+      <div class="js-ignoredStates"></div>
+    </div>
+    <div class="form-group">
+      <div class="label"><%- @T('Priorities that do not count') %></div>
+      <div class="js-ignoredPriorities"></div>
+    </div>
+
+    <button type="submit" class="btn btn--primary js-saveLoad"><%- @T('Save') %></button>
+  </form>
+</div>

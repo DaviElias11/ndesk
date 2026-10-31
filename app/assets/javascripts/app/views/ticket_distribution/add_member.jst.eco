@@ -1,0 +1,9 @@
+<div class="ticket-distribution__add controls controls--select">
+  <select class="form-control js-addMember" data-level="<%= @level %>">
+    <option value=""><%= @placeholder %></option>
+    <% for agent in @agents: %>
+      <option value="<%= agent.id %>"><%= agent.name %></option>
+    <% end %>
+  </select>
+  <%- @Icon('arrow-down') %>
+</div>

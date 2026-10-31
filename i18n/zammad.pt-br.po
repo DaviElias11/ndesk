@@ -27875,3 +27875,168 @@ msgstr "Fechar todas as abas"
 
 msgid "%s tabs, %s with unsaved changes — close anyway?"
 msgstr "%s abas, %s com alterações não salvas — fechar mesmo assim?"
+
+msgid "Add an agent to N1…"
+msgstr "Adicionar agente ao N1…"
+
+msgid "Add an agent to N2…"
+msgstr "Adicionar agente ao N2…"
+
+msgid "Complexity attribute"
+msgstr "Campo de complexidade"
+
+msgid "Configuration of the N1/N2 ticket distribution."
+msgstr "Configuração da distribuição de atendimentos N1/N2."
+
+msgid "Discord ID"
+msgstr "ID do Discord"
+
+msgid "Dispatches and campaigns"
+msgstr "Disparos e campanhas"
+
+msgid "Distribuição — Entrada"
+msgstr "Distribuição — Entrada"
+
+msgid "Distribuição — Reabertura"
+msgstr "Distribuição — Reabertura"
+
+msgid "Each weight must be an integer greater than or equal to 0."
+msgstr "Cada peso deve ser um número inteiro maior ou igual a 0."
+
+msgid "Entry (N1)"
+msgstr "Entrada (N1)"
+
+msgid "Every new ticket lands here. With more than one person, the one who has gone the longest without receiving gets it."
+msgstr "Todo ticket novo cai aqui. Com mais de uma pessoa, recebe quem está há mais tempo sem receber."
+
+msgid "Fill in the complexity before handing over."
+msgstr "Preencha a complexidade antes de repassar."
+
+msgid "Hand over to N2"
+msgstr "Repassar para o N2"
+
+msgid "How the load is counted"
+msgstr "Como a carga é contada"
+
+msgid "If a handover happened now, it would go to %s"
+msgstr "Se um repasse acontecesse agora, iria para %s"
+
+msgid "In rotation"
+msgstr "No rodízio"
+
+msgid "Inactive user"
+msgstr "Usuário inativo"
+
+msgid "Last handover"
+msgstr "Último repasse"
+
+msgid "Last ticket received"
+msgstr "Último ticket recebido"
+
+msgid "Like every ticket, it enters through N1. On handover, it goes to the responsible agent instead of the N2 rotation."
+msgstr "Como todo ticket, entra pelo N1. No repasse, vai para o responsável em vez do rodízio do N2."
+
+msgid "Load (points)"
+msgstr "Carga (pontos)"
+
+msgid "Manage the N1/N2 ticket distribution."
+msgstr "Gerenciar a distribuição de atendimentos N1/N2."
+
+msgid "N1 agents have no switch."
+msgstr "O N1 não tem interruptor."
+
+msgid "N1 · Entry"
+msgstr "N1 · Entrada"
+
+msgid "N2 · Handover"
+msgstr "N2 · Repasse"
+
+msgid "Never"
+msgstr "Nunca"
+
+msgid "No ID"
+msgstr "sem ID"
+
+msgid "No N1 agent can own tickets of this group."
+msgstr "Sem N1 que possa ser dono deste grupo."
+
+msgid "No N1 agent registered"
+msgstr "Nenhum N1 cadastrado"
+
+msgid "No N2 agent in the rotation right now."
+msgstr "Nenhum N2 no rodízio agora."
+
+msgid "No access to: %s"
+msgstr "Sem acesso a: %s"
+
+msgid "Not an agent (no ticket.agent permission)"
+msgstr "Não é agente (sem a permissão ticket.agent)"
+
+msgid "Not handed over: no N2 agent in the rotation."
+msgstr "Não repassado: nenhum N2 no rodízio."
+
+msgid "Offline · still in rotation"
+msgstr "Offline · continua no rodízio"
+
+msgid "Out of office until %s"
+msgstr "Fora do escritório até %s"
+
+msgid "Points per value"
+msgstr "Pontos por valor"
+
+msgid "Priorities that do not count"
+msgstr "Prioridades que não pesam"
+
+msgid "Receives the tickets of the preliminary analysis macro. It goes to the lowest load; on a tie, to the one who has gone the longest without receiving. Offline keeps receiving; out of office and the switch off take the agent out of the rotation."
+msgstr "Recebe os tickets da macro de análise prévia. Vai para quem tem a menor carga; no empate, para quem está há mais tempo sem receber. Offline continua recebendo; fora do escritório e interruptor desligado tiram do rodízio."
+
+msgid "Reopening"
+msgstr "Reabertura"
+
+msgid "Responsible"
+msgstr "Responsável"
+
+msgid "Situation"
+msgstr "Situação"
+
+msgid "States that do not count"
+msgstr "Estados que não pesam"
+
+msgid "Switched off"
+msgstr "Desligado"
+
+msgid "The complexity attribute is not available: handovers are refused until another one is selected."
+msgstr "O atributo de complexidade não está disponível: os repasses são recusados até que outro seja escolhido."
+
+msgid "The complexity attribute must be an active select attribute of tickets."
+msgstr "O atributo de complexidade deve ser um atributo de seleção ativo de tickets."
+
+msgid "The last N1 agent cannot be removed."
+msgstr "O último N1 não pode ser removido."
+
+msgid "The selected record does not exist."
+msgstr "O registro selecionado não existe."
+
+msgid "The sum of the points of the open tickets of the agent. A ticket without complexity counts as 0."
+msgstr "Soma dos pontos dos tickets em aberto do agente. Ticket sem complexidade pesa 0."
+
+msgid "The ticket distribution could not be updated."
+msgstr "Não foi possível atualizar a distribuição de atendimentos."
+
+msgid "This preview does not consider the group of the ticket or the dispatches and campaigns."
+msgstr "A prévia não considera o grupo do ticket nem Disparos e campanhas."
+
+msgid "Ticket Distribution"
+msgstr "Distribuição de atendimentos"
+
+msgid "Ticket distribution"
+msgstr "Distribuição de atendimentos"
+
+msgid "Ticket |%s| was not handed over: no N2 agent in the rotation"
+msgstr "O ticket |%s| não foi repassado: nenhum N2 no rodízio"
+
+msgid "Tickets that count"
+msgstr "Tickets que pesam"
+
+msgid "Who receives the new tickets (N1), who receives the handovers (N2) and how the load of each one is counted."
+msgstr "Quem recebe os tickets novos (N1), quem recebe os repasses (N2) e como a carga de cada um é contada."

@@ -16511,3 +16511,100 @@ div.accounted-time-value {
     margin-top: 8px;
   }
 }
+
+.ticket-distribution {
+  &__add {
+    max-width: 320px;
+    margin-bottom: 16px;
+  }
+
+  &__problem {
+    color: var(--danger-color);
+    font-size: 12px;
+    font-weight: normal;
+  }
+
+  &__pill {
+    display: inline-block;
+    padding: 1px 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 12px;
+    white-space: nowrap;
+    color: var(--text-normal);
+
+    &--in_rotation,
+    &--ok {
+      border-color: var(--supergood-color);
+      color: var(--supergood-color);
+    }
+
+    &--out_of_office,
+    &--warning {
+      border-color: var(--ok-color);
+      color: var(--ok-color);
+    }
+
+    &--off {
+      opacity: 0.7;
+    }
+  }
+
+  &__load {
+    white-space: nowrap;
+  }
+
+  &__bar {
+    display: inline-block;
+    width: 80px;
+    height: 6px;
+    margin-inline-end: 6px;
+    overflow: hidden;
+    vertical-align: middle;
+    border-radius: 3px;
+    background: var(--border);
+
+    @include dark {
+      background: hsla(0, 0%, 100%, 0.15);
+    }
+  }
+
+  &__bar-fill {
+    display: block;
+    height: 100%;
+    background: var(--highlight);
+  }
+
+  &__preview {
+    padding: 8px 10px;
+    border: 1px dashed var(--border-highlight);
+    border-radius: 4px;
+  }
+
+  &__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    align-items: flex-start;
+
+    .form-group {
+      min-width: 220px;
+    }
+  }
+
+  &__weights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  &__weight {
+    margin: 0;
+    font-weight: normal;
+
+    input {
+      width: 70px;
+      margin-top: 4px;
+    }
+  }
+}

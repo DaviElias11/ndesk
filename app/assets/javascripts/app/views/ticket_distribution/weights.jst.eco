@@ -1,0 +1,6 @@
+<% for weight in @weights: %>
+  <label class="ticket-distribution__weight">
+    <span><%- @T(weight.name) %></span>
+    <input class="form-control js-weight" type="number" min="0" step="1" data-value="<%= weight.value %>" value="<%= weight.points %>">
+  </label>
+<% end %>

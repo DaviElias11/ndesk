@@ -1,0 +1,3 @@
+<% for message in @messages: %>
+  <div class="ticket-distribution__problem js-problems"><%= message %></div>
+<% end %>
