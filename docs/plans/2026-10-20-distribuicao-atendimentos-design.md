@@ -306,8 +306,10 @@ está em `.superpowers/brainstorm/` (não versionado); a descrição abaixo é a
   adicionar. Abaixo, a linha "Se um repasse acontecesse agora, iria para *fulano*" — a regra de §5.3, itens
   4 e 5, sem excluir ninguém por "quem repassa", sem considerar Disparos e sem considerar o grupo do ticket
   (a tela diz isso).
-- **Alerta por membro** (o cadastro não é bloqueado) **(decisão do spec)**: inativo, sem `ticket.agent` ou sem
-  acesso `full` aos grupos que o papel exige, com o motivo (por exemplo, "sem acesso a: Suporte"):
+- **Alerta por membro** **(decisão do spec)**: inativo, sem `ticket.agent` ou sem acesso `full` aos grupos que o
+  papel exige, com o motivo (por exemplo, "sem acesso a: Suporte"). O cadastro só recusa quem não é agente ativo
+  (ajuste do QA da PR #29); o alerta cobre quem perde essa condição depois e a falta de acesso aos grupos, que
+  não bloqueia o cadastro:
   - N1: todos os grupos ativos (todo ticket entra pelo N1);
   - N2: todos os grupos ativos, menos o de Disparos;
   - responsável de Disparos: o grupo de Disparos.
