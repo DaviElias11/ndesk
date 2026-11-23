@@ -27978,6 +27978,12 @@ msgstr "Não repassado: nenhum N2 no rodízio."
 msgid "Offline · still in rotation"
 msgstr "Offline · continua no rodízio"
 
+msgid "Only active agents can be added to the ticket distribution."
+msgstr "Só agentes ativos podem ser incluídos na distribuição de atendimentos."
+
+msgid "Only agents can have a Discord ID."
+msgstr "Só agentes podem ter um ID do Discord."
+
 msgid "Out of office until %s"
 msgstr "Fora do escritório até %s"
 
@@ -28019,6 +28025,15 @@ msgstr "O registro selecionado não existe."
 
 msgid "The sum of the points of the open tickets of the agent. A ticket without complexity counts as 0."
 msgstr "Soma dos pontos dos tickets em aberto do agente. Ticket sem complexidade pesa 0."
+
+msgid "The switch only accepts true or false."
+msgstr "O interruptor só aceita verdadeiro ou falso."
+
+msgid "The ticket distribution action can only be used in macros and triggers."
+msgstr "A ação de distribuição de atendimentos só pode ser usada em macros e gatilhos."
+
+msgid "The ticket distribution configuration has an invalid format."
+msgstr "A configuração da distribuição de atendimentos está em um formato inválido."
 
 msgid "The ticket distribution could not be updated."
 msgstr "Não foi possível atualizar a distribuição de atendimentos."
