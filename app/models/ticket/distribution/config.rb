@@ -31,10 +31,19 @@ class Ticket::Distribution::Config
     modify! { |values| values.merge(params) }
   end
 
-  # Clears the Disparos responsible when it is the given user; the Disparos group is kept.
+  # Clears the Disparos responsible when it is the given user; the Disparos group is kept. Runs on every user destroy:
+  # the stored row is read without lock first, so only the destroy of the responsible waits for it.
   def self.release_dispatch_user!(user_id)
+    return if stored.dispatch_user_id != user_id
+
     modify! { |values| values['dispatch_user_id'] == user_id ? values.merge('dispatch_user_id' => nil) : values }
   end
+
+  # The stored values, bypassing the cache of Setting.get.
+  def self.stored
+    new(Setting.where(name: SETTING).pick(:state_current)&.dig('value'))
+  end
+  private_class_method :stored
 
   # Setting.get keeps the values of each process for up to 15 seconds. A merge over them would write back what another
   # process has just changed, so the merge reads the stored row, locked until the commit (two saves wait for each other).

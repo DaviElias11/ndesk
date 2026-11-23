@@ -9,9 +9,9 @@ class TicketDistributionController < ApplicationController
   end
 
   # PUT /api/v1/ticket_distribution
+  # Shows the configuration just saved: Config.current may still hold the values of this process (Setting.get cache).
   def update
-    Ticket::Distribution::Config.update!(config_params)
-    render_overview
+    render_overview(config: Ticket::Distribution::Config.update!(config_params))
   end
 
   # POST /api/v1/ticket_distribution/members
@@ -34,8 +34,8 @@ class TicketDistributionController < ApplicationController
 
   private
 
-  def render_overview
-    render json: Ticket::Distribution::Overview.new.as_json, status: :ok
+  def render_overview(config: Ticket::Distribution::Config.current)
+    render json: Ticket::Distribution::Overview.new(config:).as_json, status: :ok
   end
 
   # Only a real boolean (or its text): any other value would turn the member on.

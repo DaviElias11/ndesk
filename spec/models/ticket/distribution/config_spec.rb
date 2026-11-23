@@ -67,11 +67,29 @@ RSpec.describe Ticket::Distribution::Config, :aggregate_failures do
     end
 
     it 'locks the setting row until the commit' do
-      statements = []
-      subscriber = ->(_name, _start, _finish, _id, payload) { statements << payload[:sql] }
-      ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') { described_class.update!(weights: { 'facil' => 2 }) }
+      statements = sql_statements { described_class.update!(weights: { 'facil' => 2 }) }
 
       expect(statements.grep(%r{FROM "settings".*FOR UPDATE})).not_to be_empty
+    end
+
+    # Every user destroy releases the Disparos responsible: only the one who is it may wait for the row.
+    it 'does not lock the setting row to release a user who is not the Disparos responsible' do
+      described_class.update!(dispatch_user_id: agent.id)
+      other = create(:agent)
+      stale_cache('dispatch_user_id' => other.id)
+
+      statements = sql_statements { described_class.release_dispatch_user!(other.id) }
+
+      expect(statements.grep(%r{FROM "settings".*FOR UPDATE})).to be_empty
+      expect(stored['dispatch_user_id']).to eq(agent.id)
+    end
+
+    def sql_statements(&)
+      statements = []
+      subscriber = ->(_name, _start, _finish, _id, payload) { statements << payload[:sql] }
+      ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record', &)
+
+      statements
     end
   end
 

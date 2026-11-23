@@ -163,6 +163,17 @@ RSpec.describe 'Ticket distribution API', :aggregate_failures, db_strategy: :res
       expect(Setting.get('ticket_distribution')['ignored_state_ids']).to eq([])
     end
 
+    it 'answers with the stored configuration when the save changes nothing and this process holds older values' do
+      Ticket::Distribution::Config.update!(dispatch_group_id: group.id)
+      allow(Setting).to receive(:get).and_call_original
+      allow(Setting).to receive(:get).with('ticket_distribution').and_return(Ticket::Distribution::Config::DEFAULTS)
+
+      put '/api/v1/ticket_distribution', params: { ignored_state_ids: [] }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(json_response['config']['dispatch_group_id']).to eq(group.id)
+    end
+
     it 'accepts the weights of an attribute without options' do
       put '/api/v1/ticket_distribution', params: { weights: {} }, as: :json
 
