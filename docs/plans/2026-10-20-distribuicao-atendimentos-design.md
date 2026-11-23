@@ -368,6 +368,11 @@ Depois da virada, em produção:
 7. **Rollback:** desligar os triggers, tirar a ação da macro, atualizar a `carga_atual` da data table
    `load_balancer` com a carga mostrada na tela (ela ficou parada desde a virada) e reimportar o export atual
    dos três fluxos do n8n.
+   - **Se o código também voltar** para uma versão sem a distribuição, desligar os dois triggers e tirar a ação
+     da macro **antes** do deploy. O código antigo não conhece a ação: com "Distribuição — Entrada" ou
+     "Distribuição — Reabertura" ligado, o Zammad para no trigger da distribuição, e os triggers que vêm
+     depois dele na ordem alfabética (os do n8n, em produção) deixam de rodar. A tela não mostra erro, só o
+     log ("The given trigger contains no valid actions"). Visto no QA da PR #29.
 
 Os exports do n8n carregam o token da API do NDesk em texto nos headers. Eles são necessários para o
 rollback: guardar num cofre (nunca no git), apagar do Downloads e trocar o token depois da virada.

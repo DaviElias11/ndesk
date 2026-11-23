@@ -1313,7 +1313,8 @@ critério 6 depende desta tarefa. A fonte é o spec §8.1 e §8.3; a lista abaix
 - [ ] Rodar o checklist do spec §8.2 e revisar os tickets criados ou repassados na janela.
 - [ ] Trocar o token da API do NDesk usado pelo n8n.
 - [ ] Rollback (se preciso), conforme o spec §8.3, item 7:
-  - desligar os triggers e tirar a ação da macro;
+  - desligar os triggers e tirar a ação da macro, **antes** de qualquer deploy de código sem a distribuição
+    (com o código antigo e um dos dois triggers ligado, os triggers seguintes, os do n8n, param em silêncio);
   - atualizar a `carga_atual` da data table `load_balancer` com a carga da tela;
   - reimportar os três exports.
 
