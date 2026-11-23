@@ -163,6 +163,7 @@ RSpec.describe Ticket::Distribution::Overview, :aggregate_failures, db_strategy:
     expect(overview[:options][:agents]).to include(id: agent.id, name: agent.fullname)
     expect(overview[:options][:groups]).to include(include(id: group.id, name: group.name))
     expect(overview[:options][:states]).to include(include(name: 'open'))
+    expect(overview[:options][:states].pluck(:name)).to include('new', 'pending close').and(not_include('closed')).and(not_include('merged'))
     expect(overview[:options][:priorities]).to include(include(name: '2 normal'))
     expect(overview[:options][:complexity_attributes]).to eq(Ticket::Distribution::Config.complexity_attribute_options)
   end

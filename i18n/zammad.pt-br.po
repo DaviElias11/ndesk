@@ -27882,6 +27882,9 @@ msgstr "Adicionar agente ao N1…"
 msgid "Add an agent to N2…"
 msgstr "Adicionar agente ao N2…"
 
+msgid "Closed and merged tickets never count."
+msgstr "Tickets fechados e mesclados nunca pesam."
+
 msgid "Complexity attribute"
 msgstr "Campo de complexidade"
 

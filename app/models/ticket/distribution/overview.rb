@@ -86,7 +86,7 @@ class Ticket::Distribution::Overview
     {
       agents:                agents,
       groups:                Group.where(active: true).reorder(:name).map { |group| { id: group.id, name: group.name } },
-      states:                Ticket::State.reorder(:name).map { |state| { id: state.id, name: state.name } },
+      states:                Ticket::Distribution::Load.open_states.reorder(:name).map { |state| { id: state.id, name: state.name } },
       priorities:            Ticket::Priority.reorder(:name).map { |priority| { id: priority.id, name: priority.name } },
       complexity_attributes: Ticket::Distribution::Config.complexity_attribute_options,
     }

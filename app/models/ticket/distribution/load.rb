@@ -4,6 +4,11 @@
 class Ticket::Distribution::Load
   CLOSED_STATE_TYPES = %w[closed merged removed].freeze
 
+  # The states whose tickets count: closed, merged and removed ones never do.
+  def self.open_states
+    Ticket::State.where.not(state_type_id: Ticket::StateType.where(name: CLOSED_STATE_TYPES).select(:id))
+  end
+
   def initialize(config)
     @config = config
   end
@@ -39,17 +44,13 @@ class Ticket::Distribution::Load
   # attr was checked against Ticket.column_names by the caller, it is never interpolated from anywhere else.
   def counts(user_ids, attr, exclude_ticket_id)
     scope = Ticket
-      .where(owner_id: user_ids, state_id: open_state_ids)
+      .where(owner_id: user_ids, state_id: self.class.open_states.select(:id))
       .where.not(state_id: @config.ignored_state_ids)
       .where.not(priority_id: @config.ignored_priority_ids)
 
     scope = scope.where.not(id: exclude_ticket_id) if exclude_ticket_id
 
     scope.group(:owner_id, attr).count
-  end
-
-  def open_state_ids
-    Ticket::State.where.not(state_type_id: Ticket::StateType.where(name: CLOSED_STATE_TYPES).select(:id)).select(:id)
   end
 
   def log_unknown(attr, values)

@@ -159,23 +159,34 @@ RSpec.describe 'Manage > Ticket Distribution', :aggregate_failures, authenticate
       expect(config).to have_attributes(complexity_attribute: 'esforco', weights: { 'alto' => 5 })
     end
 
+    it 'offers only the open states, as the closed and merged ones never count' do
+      visit 'manage/ticket_distribution'
+
+      expect(page).to have_text('Closed and merged tickets never count.')
+      within('.js-ignoredStates') do
+        expect(page).to have_css('.js-pool .js-option', text: 'pending close')
+        expect(page).to have_no_css('.js-option', text: 'closed')
+        expect(page).to have_no_css('.js-option', text: 'merged')
+      end
+    end
+
     it 'saves and clears the states and priorities that do not count' do
-      closed = Ticket::State.find_by(name: 'closed')
-      low    = Ticket::Priority.find_by(name: '1 low')
+      pending_close = Ticket::State.find_by(name: 'pending close')
+      low           = Ticket::Priority.find_by(name: '1 low')
 
       visit 'manage/ticket_distribution'
 
-      within('.js-ignoredStates') { find('.js-pool .js-option', text: closed.name).click }
+      within('.js-ignoredStates') { find('.js-pool .js-option', text: pending_close.name).click }
       within('.js-ignoredPriorities') { find('.js-pool .js-option', text: low.name).click }
       click '.js-saveLoad'
 
       expect(page).to have_css('.noty_message', text: 'Update successful.')
-      expect(config.ignored_state_ids).to eq([closed.id])
+      expect(config.ignored_state_ids).to eq([pending_close.id])
       expect(config.ignored_priority_ids).to eq([low.id])
 
       reload_screen
 
-      within('.js-ignoredStates') { find('.js-selected .js-option', text: closed.name).click }
+      within('.js-ignoredStates') { find('.js-selected .js-option', text: pending_close.name).click }
       within('.js-ignoredPriorities') { find('.js-selected .js-option', text: low.name).click }
       click '.js-saveLoad'
 

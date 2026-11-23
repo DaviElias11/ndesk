@@ -182,6 +182,7 @@
 
     <div class="form-group">
       <div class="label"><%- @T('States that do not count') %></div>
+      <p class="help-text"><%- @T('Closed and merged tickets never count.') %></p>
       <div class="js-ignoredStates"></div>
     </div>
     <div class="form-group">

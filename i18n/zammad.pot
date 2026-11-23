@@ -3436,6 +3436,10 @@ msgstr ""
 msgid "Closed Tickets"
 msgstr ""
 
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:185
+msgid "Closed and merged tickets never count."
+msgstr ""
+
 #: app/frontend/apps/desktop/pages/organization/components/OrganizationRelatedTickets.vue:29
 #: app/frontend/apps/desktop/pages/ticket/components/TicketSidebar/TicketSidebarCustomer/TicketSidebarCustomerContent.vue:138
 #: app/frontend/apps/desktop/pages/user/components/UserRelatedCustomerTickets.vue:31
@@ -12949,7 +12953,7 @@ msgstr ""
 msgid "Prio"
 msgstr ""
 
-#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:188
+#: app/assets/javascripts/app/views/ticket_distribution/index.jst.eco:189
 msgid "Priorities that do not count"
 msgstr ""
 
