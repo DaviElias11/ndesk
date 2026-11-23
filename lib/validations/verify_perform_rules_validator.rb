@@ -23,6 +23,7 @@ class Validations::VerifyPerformRulesValidator < ActiveModel::EachValidator
 
     check_present(record, attribute, value)
     check_specific_present(record, attribute, value)
+    check_distribution_performer(record, value)
     check_distribution_mode(record, attribute, value)
   end
 
@@ -59,6 +60,14 @@ class Validations::VerifyPerformRulesValidator < ActiveModel::EachValidator
 
       result << key if value[key]['value'].blank?
     end
+  end
+
+  # The scheduler editor does not offer the action: a job runs it on many tickets at once, outside the locks of a macro.
+  def check_distribution_performer(record, value)
+    return if value['distribution.ticket_distribution'].nil?
+    return if record.is_a?(Macro) || record.is_a?(Trigger)
+
+    record.errors.add :base, __('The ticket distribution action can only be used in macros and triggers.')
   end
 
   def check_distribution_mode(record, attribute, value)

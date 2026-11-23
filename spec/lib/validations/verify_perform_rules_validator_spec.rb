@@ -73,6 +73,17 @@ RSpec.describe Validations::VerifyPerformRulesValidator do
         expect(build(:macro, perform: { 'distribution.ticket_distribution' => { 'value' => mode } })).to be_valid
       end
     end
+
+    it 'accepts the action in a trigger' do
+      expect(build(:trigger, perform: { 'distribution.ticket_distribution' => { 'value' => 'entry' } })).to be_valid
+    end
+
+    it 'refuses the action in a scheduler job' do
+      job = build(:job, perform: { 'distribution.ticket_distribution' => { 'value' => 'handover' } })
+
+      expect(job).not_to be_valid
+      expect(job.errors.full_messages).to include('The ticket distribution action can only be used in macros and triggers.')
+    end
   end
 
   context 'when validating presence with precondition' do
