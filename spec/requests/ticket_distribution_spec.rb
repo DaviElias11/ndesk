@@ -48,6 +48,16 @@ RSpec.describe 'Ticket distribution API', :aggregate_failures, db_strategy: :res
       expect(Ticket::DistributionMember.n2.pluck(:user_id)).to eq([agent.id])
     end
 
+    it 'rejects a user who is not an active agent' do
+      [create(:customer), create(:agent, active: false)].each do |user|
+        post '/api/v1/ticket_distribution/members', params: { user_id: user.id, level: 'n2' }, as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(json_response['error']).to eq('Only active agents can be added to the ticket distribution.')
+      end
+      expect(Ticket::DistributionMember.count).to eq(0)
+    end
+
     it 'rejects a duplicate' do
       create(:ticket_distribution_member, user: agent)
       post '/api/v1/ticket_distribution/members', params: { user_id: agent.id, level: 'n2' }, as: :json
@@ -62,6 +72,26 @@ RSpec.describe 'Ticket distribution API', :aggregate_failures, db_strategy: :res
       expect(response).to have_http_status(:ok)
       expect(member.reload.active).to be(false)
       expect(json_response['n2'].first['situation']).to eq('off')
+    end
+
+    it 'switches an N2 on with the text true' do
+      member = create(:ticket_distribution_member, user: agent, active: false)
+      put "/api/v1/ticket_distribution/members/#{member.id}", params: { active: 'true' }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(member.reload.active).to be(true)
+    end
+
+    it 'rejects a switch value that is not a boolean' do
+      member = create(:ticket_distribution_member, user: agent, active: false)
+
+      [{ active: 'qualquer' }, { active: 1 }, {}].each do |params|
+        put "/api/v1/ticket_distribution/members/#{member.id}", params:, as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(json_response['error']).to eq('The switch only accepts true or false.')
+      end
+      expect(member.reload.active).to be(false)
     end
 
     it 'rejects the switch on an N1' do
@@ -131,6 +161,32 @@ RSpec.describe 'Ticket distribution API', :aggregate_failures, db_strategy: :res
 
       expect(response).to have_http_status(:ok)
       expect(Setting.get('ticket_distribution')['ignored_state_ids']).to eq([])
+    end
+
+    it 'accepts the weights of an attribute without options' do
+      put '/api/v1/ticket_distribution', params: { weights: {} }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(Setting.get('ticket_distribution')['weights']).to eq({})
+    end
+
+    it 'rejects a known key in the wrong format and changes nothing' do
+      before = Setting.get('ticket_distribution')
+
+      [{ weights: 'x' }, { weights: [1] }, { ignored_state_ids: '1' }, { complexity_attribute: { name: 'x' } },
+       { dispatch_group_id: [group.id] }, { weights: { facil: 2 }, ignored_priority_ids: 'x' }].each do |params|
+        put '/api/v1/ticket_distribution', params:, as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity), "#{params.inspect} got #{response.status}"
+        expect(json_response['error']).to eq('The ticket distribution configuration has an invalid format.')
+      end
+      expect(Setting.get('ticket_distribution')).to eq(before)
+    end
+
+    it 'rejects a body without any known key' do
+      put '/api/v1/ticket_distribution', params: { evil: 'x' }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it 'does not let an unknown key reach the setting' do

@@ -34,6 +34,47 @@ RSpec.describe Ticket::Distribution::Config, :aggregate_failures do
     end
   end
 
+  # Setting.get keeps the values of each process for up to 15 seconds: another process may have written since.
+  context 'when the values of this process are older than the stored ones' do
+    let(:group) { create(:group) }
+    let(:agent) { create(:agent) }
+
+    def stale_cache(values)
+      allow(Setting).to receive(:get).and_call_original
+      allow(Setting).to receive(:get).with(described_class::SETTING).and_return(described_class::DEFAULTS.merge(values))
+    end
+
+    def stored
+      Setting.find_by(name: described_class::SETTING).state_current['value']
+    end
+
+    it 'merges an update over the stored values, not over the old ones' do
+      described_class.update!(dispatch_group_id: group.id)
+      stale_cache('dispatch_group_id' => nil, 'dispatch_user_id' => agent.id)
+
+      described_class.update!(weights: { 'facil' => 2 })
+
+      expect(stored).to include('dispatch_group_id' => group.id, 'dispatch_user_id' => nil, 'weights' => { 'facil' => 2 })
+    end
+
+    it 'releases the Disparos responsible that only the stored values have' do
+      described_class.update!(dispatch_group_id: group.id, dispatch_user_id: agent.id)
+      stale_cache('dispatch_user_id' => nil)
+
+      described_class.release_dispatch_user!(agent.id)
+
+      expect(stored).to include('dispatch_group_id' => group.id, 'dispatch_user_id' => nil)
+    end
+
+    it 'locks the setting row until the commit' do
+      statements = []
+      subscriber = ->(_name, _start, _finish, _id, payload) { statements << payload[:sql] }
+      ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') { described_class.update!(weights: { 'facil' => 2 }) }
+
+      expect(statements.grep(%r{FROM "settings".*FOR UPDATE})).not_to be_empty
+    end
+  end
+
   context 'without the complexity attribute' do
     it 'reports it as absent and reads no complexity' do
       expect(config.complexity_attribute_present?).to be(false)

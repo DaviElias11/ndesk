@@ -7,9 +7,10 @@
 module Ticket::Distribution::Lock
   KEY = Zlib.crc32('ndesk.ticket_distribution')
 
+  # Has to be called inside a transaction: the advisory lock lasts until its commit.
   def self.acquire!(ticket_id)
     Ticket.where(id: ticket_id).lock.pluck(:id)
-    ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql_array(['SELECT pg_advisory_xact_lock(?)', KEY]))
+    advisory_lock!
 
     nil
   end
@@ -17,4 +18,19 @@ module Ticket::Distribution::Lock
   def self.lock_tickets!(ids)
     Ticket.where(id: ids).reorder(:id).lock.to_a
   end
+
+  # For the writes on the N1/N2 lists, which lock no ticket: the block waits for the decision in course, and the next
+  # decision waits for its commit, so it reads what the block wrote.
+  def self.synchronize
+    ActiveRecord::Base.transaction do
+      advisory_lock!
+
+      yield
+    end
+  end
+
+  def self.advisory_lock!
+    ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql_array(['SELECT pg_advisory_xact_lock(?)', KEY]))
+  end
+  private_class_method :advisory_lock!
 end

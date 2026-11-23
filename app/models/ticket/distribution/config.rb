@@ -28,16 +28,27 @@ class Ticket::Distribution::Config
     params['dispatch_group_id']    = coerce_id!(::Group, params['dispatch_group_id'])                    if params.key?('dispatch_group_id')
     params['dispatch_user_id']     = coerce_id!(::User, params['dispatch_user_id'])                      if params.key?('dispatch_user_id')
 
-    Setting.set(SETTING, current.to_h.merge(params))
-    current
+    modify! { |values| values.merge(params) }
   end
 
   # Clears the Disparos responsible when it is the given user; the Disparos group is kept.
   def self.release_dispatch_user!(user_id)
-    return if current.dispatch_user_id != user_id
-
-    update!(dispatch_user_id: nil)
+    modify! { |values| values['dispatch_user_id'] == user_id ? values.merge('dispatch_user_id' => nil) : values }
   end
+
+  # Setting.get keeps the values of each process for up to 15 seconds. A merge over them would write back what another
+  # process has just changed, so the merge reads the stored row, locked until the commit (two saves wait for each other).
+  def self.modify!
+    Setting.transaction do
+      setting = Setting.lock.find_by!(name: SETTING)
+      before  = new(setting.state_current['value']).to_h
+      after   = yield before
+
+      Setting.set(SETTING, after) if after != before
+      new(after)
+    end
+  end
+  private_class_method :modify!
 
   # Ticket attributes that can be used as the complexity source: active, editable selects without relation.
   def self.complexity_attribute_options

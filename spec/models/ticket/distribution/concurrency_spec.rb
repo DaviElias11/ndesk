@@ -128,6 +128,18 @@ RSpec.describe 'Ticket distribution concurrency', :aggregate_failures, type: :mo
     end
   end
 
+  # Holds the threads marked with :hold_after_destroy just after they remove a member, before the commit.
+  def hold_after_destroy(held:, release:)
+    allow_any_instance_of(Ticket::DistributionMember).to receive(:destroy!).and_wrap_original do |original, *args, **kwargs|
+      original.call(*args, **kwargs).tap do
+        next if !Thread.current[:hold_after_destroy]
+
+        held << true
+        release.pop(timeout: wait_seconds)
+      end
+    end
+  end
+
   def backend_pid
     ActiveRecord::Base.connection.raw_connection.backend_pid
   end
@@ -215,5 +227,63 @@ RSpec.describe 'Ticket distribution concurrency', :aggregate_failures, type: :mo
     expect(owner_of_ticket_2).not_to eq(n1.user_id)
     expect(await(seen)[ticket_2.id]).to eq(owner_of_ticket_2)
     expect([ticket_1.reload.owner_id, owner_of_ticket_2]).to contain_exactly(n2_a.user_id, n2_b.user_id)
+  end
+
+  it 'makes the switch off of an N2 wait for the handover in course, and the next handover skips the N2' do
+    held    = Queue.new
+    release = Queue.new
+    pids    = Queue.new
+
+    hold_in_load(held:, release:)
+
+    handover = in_thread do
+      Thread.current[:hold_in_load] = true
+      apply_macro_in_lock(ticket_1.id)
+    end
+    await(held)
+
+    switch = in_thread do
+      pids << backend_pid
+      Ticket::Distribution::Roster.switch!(n2_a.id, active: false)
+    end
+
+    expect(lock_awaited_by(switch, await(pids))).to eq('advisory')
+
+    release << true
+    finish(handover, switch)
+    finish(in_thread { apply_macro_in_lock(ticket_2.id) })
+
+    expect(n2_a.reload.active).to be(false)
+    expect([ticket_1.reload.owner_id, ticket_2.reload.owner_id]).to eq([n2_a.user_id, n2_b.user_id])
+  end
+
+  it 'makes the removal of an N1 wait for the commit of another removal, so the last N1 stays' do
+    n1_b    = create(:ticket_distribution_member, :n1, user: create(:agent, groups: [group]))
+    held    = Queue.new
+    release = Queue.new
+    pids    = Queue.new
+
+    hold_after_destroy(held:, release:)
+
+    first = in_thread do
+      Thread.current[:hold_after_destroy] = true
+      Ticket::Distribution::Roster.remove!(n1_b.id)
+    end
+    await(held)
+
+    second = in_thread do
+      pids << backend_pid
+      Ticket::Distribution::Roster.remove!(n1.id)
+    rescue Exceptions::UnprocessableEntity => e
+      e
+    end
+
+    expect(lock_awaited_by(second, await(pids))).to eq('advisory')
+
+    release << true
+    finish(first, second)
+
+    expect(second.value).to be_a(Exceptions::UnprocessableEntity)
+    expect(Ticket::DistributionMember.n1.pluck(:id)).to eq([n1.id])
   end
 end

@@ -16,28 +16,19 @@ class TicketDistributionController < ApplicationController
 
   # POST /api/v1/ticket_distribution/members
   def member_create
-    Ticket::DistributionMember.create!(params.permit(:user_id, :level))
+    Ticket::Distribution::Roster.add!(user_id: params[:user_id], level: params[:level])
     render_overview
   end
 
   # PUT /api/v1/ticket_distribution/members/:id
   def member_update
-    member = Ticket::DistributionMember.find(params[:id])
-    raise Exceptions::UnprocessableEntity, __('N1 agents have no switch.') if member.level == 'n1'
-
-    member.update!(active: ActiveModel::Type::Boolean.new.cast(params[:active]))
+    Ticket::Distribution::Roster.switch!(params[:id], active: switch_param)
     render_overview
   end
 
   # DELETE /api/v1/ticket_distribution/members/:id
   def member_destroy
-    member = Ticket::DistributionMember.find(params[:id])
-
-    if member.level == 'n1' && Ticket::DistributionMember.n1.where.not(id: member.id).none?
-      raise Exceptions::UnprocessableEntity, __('The last N1 agent cannot be removed.')
-    end
-
-    member.destroy!
+    Ticket::Distribution::Roster.remove!(params[:id])
     render_overview
   end
 
@@ -47,8 +38,25 @@ class TicketDistributionController < ApplicationController
     render json: Ticket::Distribution::Overview.new.as_json, status: :ok
   end
 
+  # Only a real boolean (or its text): any other value would turn the member on.
+  def switch_param
+    case params[:active]
+    when true, 'true' then true
+    when false, 'false' then false
+    else raise Exceptions::UnprocessableEntity, __('The switch only accepts true or false.')
+    end
+  end
+
+  # Unknown keys are ignored, but a known key that does not fit its format is refused instead of silently dropped.
   def config_params
-    params.permit(:complexity_attribute, :dispatch_group_id, :dispatch_user_id,
-                  weights: {}, ignored_state_ids: [], ignored_priority_ids: []).to_h
+    permitted = params.permit(:complexity_attribute, :dispatch_group_id, :dispatch_user_id,
+                              weights: {}, ignored_state_ids: [], ignored_priority_ids: []).to_h
+    given     = Ticket::Distribution::Config::DEFAULTS.keys & params.keys
+
+    if given.empty? || (given - permitted.keys).any?
+      raise Exceptions::UnprocessableEntity, __('The ticket distribution configuration has an invalid format.')
+    end
+
+    permitted
   end
 end
