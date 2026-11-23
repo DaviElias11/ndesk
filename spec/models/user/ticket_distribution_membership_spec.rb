@@ -39,6 +39,30 @@ RSpec.describe User::TicketDistributionMembership, type: :model do
     expect(build(:agent, discord_uid: '')).to be_valid
   end
 
+  it 'strips the spaces around the Discord ID and saves only spaces as nothing', :aggregate_failures do
+    agent.update!(discord_uid: ' 123456789012345678 ')
+    expect(agent.reload.discord_uid).to eq('123456789012345678')
+
+    agent.update!(discord_uid: '   ')
+    expect(agent.reload.discord_uid).to be_nil
+  end
+
+  it 'gives a Discord ID only to agents', :aggregate_failures do
+    customer = create(:customer)
+
+    expect { customer.update!(discord_uid: '123456789012345678') }.to raise_error(ActiveRecord::RecordInvalid, %r{Only agents can have a Discord ID.})
+    expect(customer.reload.discord_uid).to be_nil
+    expect(build(:customer, discord_uid: '123456789012345678')).not_to be_valid
+    expect(build(:agent, discord_uid: '123456789012345678', roles: Role.where(name: %w[Agent Customer]))).to be_valid
+  end
+
+  it 'keeps the Discord ID of a former agent on later saves' do
+    agent.update!(discord_uid: '123456789012345678')
+    agent.update!(roles: Role.where(name: 'Customer'))
+
+    expect { agent.update!(firstname: 'Renamed') }.not_to raise_error
+  end
+
   it 'saves a real Discord ID on an existing user and records history', :aggregate_failures do
     agent.update!(discord_uid: '123456789012345678')
 
@@ -59,6 +83,15 @@ RSpec.describe User::TicketDistributionMembership, type: :model do
 
       expect(response).to have_http_status(:ok)
       expect(agent.reload.discord_uid).to eq('123456789012345678')
+    end
+
+    it 'does not let an agent set the Discord ID of a customer', :aggregate_failures do
+      customer = create(:customer)
+      authenticated_as(create(:agent))
+      put "/api/v1/users/#{customer.id}", params: { discord_uid: '123456789012345678' }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(customer.reload.discord_uid).to be_nil
     end
   end
 end
