@@ -131,6 +131,15 @@ regra; quem não passa é pulado, nunca escolhido. **(decisão do spec)**
 
 ### 5.3 Repasse (macro de análise prévia → N2)
 
+**Como o N1 repassa.** Em produção, o N1 insere a resposta de análise prévia pelo módulo de texto (`::`) e
+clica em Atualizar, e o n8n reconhece o texto. Depois da virada, ele continua inserindo o texto pelo `::`, mas
+envia escolhendo a macro "Análise prévia" na seta ao lado de Atualizar. A macro leva junto a resposta escrita
+(`App.Ticket.macro` e `tickets_controller#update`). Sem complexidade, a recusa vale também para a resposta: ela
+continua no editor e nada é enviado. A macro de produção tem **só** a ação de distribuição, porque uma ação de
+artigo na macro substituiria a resposta escrita (`App.Ticket.macro` sobrescreve o artigo). Quem clica em
+Atualizar envia a resposta sem repasse: o ticket fica com o N1, e o Discord menciona o N1. **(decisão do
+usuário, 23/11/2026)**
+
 1. **Sem complexidade, não há repasse:** a macro é recusada (§6.3). O N1 preenche e clica de novo. O valor
    lido é o do ticket em memória, já com o que veio no mesmo envio (`tickets_controller.rb#update` faz
    `assign_attributes` antes da macro), para o N1 poder preencher e aplicar a macro de uma vez.
@@ -202,7 +211,8 @@ regra; quem não passa é pulado, nunca escolhido. **(decisão do spec)**
 - "Aberto" = estado cuja categoria (`state_type`) não é `closed`, `merged` nem `removed`. Inclui as
   categorias de pendência, onde deve ficar "Aguardando cliente" (confirmar em produção, §12).
   **(decisão do spec)**
-- Não pesam: tickets em estados ou prioridades marcados na tela.
+- Não pesam: tickets em estados ou prioridades marcados na tela. A lista de estados da tela só oferece os
+  abertos, porque fechados e mesclados já nunca pesam.
 - Ticket sem complexidade pesa 0. Valor de complexidade sem peso cadastrado pesa 0 e vai para o log uma vez
   por decisão, não por ticket.
 - Ao decidir para um ticket, ele mesmo fica fora da soma.
@@ -316,7 +326,8 @@ está em `.superpowers/brainstorm/` (não versionado); a descrição abaixo é a
 - **Disparos e campanhas:** seleção do grupo e do responsável, com o texto "Como todo ticket, entra pelo N1.
   No repasse, vai para o responsável em vez do rodízio do N2."
 - **Como a carga é contada:** atributo de complexidade (seleção entre os atributos de ticket do tipo
-  seleção), pesos por valor, estados que não pesam, prioridades que não pesam.
+  seleção), pesos por valor, estados que não pesam (só os abertos, com o texto "Tickets fechados e mesclados
+  nunca pesam."), prioridades que não pesam.
 - **Cadastro do agente:** campo "ID do Discord".
 
 O interruptor e a lista salvam na hora; os blocos de Disparos e de carga têm botão Salvar (padrão das telas
@@ -355,15 +366,16 @@ Depois da virada, em produção:
 
 ### 8.3 Virada
 
-1. **Deploy** com os dois triggers desligados e a macro sem a ação nova: nada muda no comportamento.
+1. **Deploy** com os dois triggers desligados e nenhuma macro com a ação nova: nada muda no comportamento.
 2. **Configuração:** o admin preenche os IDs do Discord, as listas de N1 e N2, o responsável de Disparos e as
    regras de carga, e resolve os alertas da tela.
 3. **Revisão dos triggers ativos de produção:** procurar condições sobre o dono e ações que mudem grupo ou
    estado na criação e na atualização (§6.2).
 4. **Recarga:** garantir que todos os agentes recarreguem o NDesk depois do deploy, porque abas com o JS antigo
    não mandam a ação nova na macro (§6.1).
-5. **Ligar o NDesk e logo depois o n8n**, fora do horário de pico: ligar os dois triggers e incluir a ação
-   (modo Repasse) na macro de análise prévia; em seguida, publicar o n8n do roteiro de §8.1 e desativar os
+5. **Ligar o NDesk e logo depois o n8n**, fora do horário de pico: ligar os dois triggers, criar a macro "Análise prévia"
+   só com a ação (modo Repasse), sem artigo (§5.3), e avisar o N1 de que a análise prévia passa a sair pela
+   macro; em seguida, publicar o n8n do roteiro de §8.1 e desativar os
    dois fluxos do LB. Nessa ordem, a janela entre os dois passos só tem o n8n sobrescrevendo com o
    comportamento antigo; na ordem inversa, os tickets ficariam sem dono.
 6. **Checklist** de §8.2 e revisão dos tickets criados ou repassados durante a janela.
@@ -448,5 +460,7 @@ Antes de rodar: `rm -f db/schema.rb` (o banco de teste é construído por migrat
   "Melhoria" (se forem `closed`, sair deles conta como reabertura).
 - Se algum grupo tem o follow-up configurado para criar ticket novo: aí a resposta a um ticket fechado vira
   ticket novo, vai para a Entrada, e a "volta para quem atendeu" não acontece.
+- Se já existe uma macro de análise prévia. Hoje o N1 usa o módulo de texto (`::`). Se existir, a ação de artigo
+  sai dela na virada (§5.3).
 - As condições do trigger "Ticket Atualizado" de produção: se ele dispara para notas internas, e quem é o
   usuário 11 da lista antiga do "É o suporte?".
