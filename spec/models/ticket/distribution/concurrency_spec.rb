@@ -7,8 +7,10 @@ require 'rails_helper'
 RSpec.describe 'Ticket distribution concurrency', :aggregate_failures, type: :model do
   self.use_transactional_tests = false
 
+  # The setting is read from its row: Setting.get could answer with the cache of an earlier example, rolled back by
+  # RSpec (the around runs before the Setting.reload of spec/support/cache.rb), and the ensure would commit it.
   around do |example|
-    setting  = Setting.get(Ticket::Distribution::Config::SETTING)
+    setting  = Setting.find_by(name: Ticket::Distribution::Config::SETTING).state_current['value']
     baseline = created_models.index_with { |model| model.maximum(:id).to_i }
 
     begin
@@ -234,6 +236,8 @@ RSpec.describe 'Ticket distribution concurrency', :aggregate_failures, type: :mo
     release = Queue.new
     pids    = Queue.new
 
+    # n2_b carries more load than n2_a will have after ticket_1: without the switch, ticket_2 would go to n2_a.
+    create(:ticket, group:, owner: n2_b.user, state: open_state, complexidades: 'complexo')
     hold_in_load(held:, release:)
 
     handover = in_thread do
