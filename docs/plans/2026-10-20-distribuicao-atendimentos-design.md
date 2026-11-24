@@ -131,14 +131,14 @@ regra; quem não passa é pulado, nunca escolhido. **(decisão do spec)**
 
 ### 5.3 Repasse (macro de análise prévia → N2)
 
-**Como o N1 repassa.** Em produção, o N1 insere a resposta de análise prévia pelo módulo de texto (`::`) e
-clica em Atualizar, e o n8n reconhece o texto. Depois da virada, ele continua inserindo o texto pelo `::`, mas
-envia escolhendo a macro "Análise prévia" na seta ao lado de Atualizar. A macro leva junto a resposta escrita
-(`App.Ticket.macro` e `tickets_controller#update`). Sem complexidade, a recusa vale também para a resposta: ela
-continua no editor e nada é enviado. A macro de produção tem **só** a ação de distribuição, porque uma ação de
-artigo na macro substituiria a resposta escrita (`App.Ticket.macro` sobrescreve o artigo). Quem clica em
-Atualizar envia a resposta sem repasse: o ticket fica com o N1, e o Discord menciona o N1. **(decisão do
-usuário, 23/11/2026)**
+**Como o N1 repassa.** Em produção, o N1 insere a resposta de análise prévia pelo módulo de texto (`::`,
+palavra-chave `n2`) e clica em Atualizar: a resposta sai como nota, e o n8n reconhece o texto. Depois da
+virada, o N1 só aplica a macro "Análise prévia" (seta ao lado de Atualizar), sem o `::`. A macro leva a mesma
+nota, com o texto do módulo `n2` e a mesma visibilidade (interna ou pública) da nota de hoje, e a ação de
+distribuição. Sem complexidade, a recusa desfaz tudo, e a nota não sai (§6.3). Se o N1 escrever algo no editor
+antes, a macro troca pelo texto dela (`App.Ticket.macro` sobrescreve o artigo). Quem usar o `::` e clicar em
+Atualizar envia a nota sem repasse: o ticket fica com o N1, e o Discord menciona o N1. **(decisão do usuário,
+23/11/2026)**
 
 1. **Sem complexidade, não há repasse:** a macro é recusada (§6.3). O N1 preenche e clica de novo. O valor
    lido é o do ticket em memória, já com o que veio no mesmo envio (`tickets_controller.rb#update` faz
@@ -374,8 +374,8 @@ Depois da virada, em produção:
 4. **Recarga:** garantir que todos os agentes recarreguem o NDesk depois do deploy, porque abas com o JS antigo
    não mandam a ação nova na macro (§6.1).
 5. **Ligar o NDesk e logo depois o n8n**, fora do horário de pico: ligar os dois triggers, criar a macro "Análise prévia"
-   só com a ação (modo Repasse), sem artigo (§5.3), e avisar o N1 de que a análise prévia passa a sair pela
-   macro; em seguida, publicar o n8n do roteiro de §8.1 e desativar os
+   com a nota de análise prévia e a ação (modo Repasse) (§5.3), e avisar o N1 de que a análise prévia passa a
+   ser um clique na macro, sem o `::`; em seguida, publicar o n8n do roteiro de §8.1 e desativar os
    dois fluxos do LB. Nessa ordem, a janela entre os dois passos só tem o n8n sobrescrevendo com o
    comportamento antigo; na ordem inversa, os tickets ficariam sem dono.
 6. **Checklist** de §8.2 e revisão dos tickets criados ou repassados durante a janela.
@@ -460,7 +460,9 @@ Antes de rodar: `rm -f db/schema.rb` (o banco de teste é construído por migrat
   "Melhoria" (se forem `closed`, sair deles conta como reabertura).
 - Se algum grupo tem o follow-up configurado para criar ticket novo: aí a resposta a um ticket fechado vira
   ticket novo, vai para a Entrada, e a "volta para quem atendeu" não acontece.
-- Se já existe uma macro de análise prévia. Hoje o N1 usa o módulo de texto (`::`). Se existir, a ação de artigo
-  sai dela na virada (§5.3).
+- Se já existe uma macro de análise prévia (hoje o N1 usa o módulo de texto `n2`). Se existir, ela ganha a ação
+  na virada, em vez de nascer outra (§5.3).
+- Se a nota de análise prévia que o N1 manda hoje sai interna ou pública: a nota da macro sai igual, para o
+  trigger "Ticket Atualizado" e o n8n a tratarem como hoje.
 - As condições do trigger "Ticket Atualizado" de produção: se ele dispara para notas internas, e quem é o
   usuário 11 da lista antiga do "É o suporte?".

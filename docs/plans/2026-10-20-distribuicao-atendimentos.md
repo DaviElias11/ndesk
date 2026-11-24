@@ -1306,9 +1306,10 @@ critério 6 depende desta tarefa. A fonte é o spec §8.1 e §8.3; a lista abaix
 - [ ] Garantir que todos os agentes recarreguem o NDesk (aba com JS antigo não manda a ação).
 - [ ] Fora do pico, nesta ordem:
   1. ligar "Distribuição — Entrada" e "Distribuição — Reabertura";
-  2. criar a macro "Análise prévia" só com a ação "Ticket Distribution → Hand over to N2", sem artigo. Se já
-     existir uma, tirar dela a ação de artigo, que apagaria a resposta escrita. Avisar o N1: a análise prévia
-     continua com o `::`, mas sai pela macro (seta ao lado de Atualizar), não pelo Atualizar (spec §5.3);
+  2. criar a macro "Análise prévia" com a ação de nota (o texto do módulo de texto `n2`, com a mesma
+     visibilidade da nota que o N1 manda hoje) e a ação "Ticket Distribution → Hand over to N2". Se já existir
+     uma macro de análise prévia, acrescentar a ação a ela. Avisar o N1: a análise prévia passa a ser só
+     aplicar a macro (seta ao lado de Atualizar), sem o `::` (spec §5.3);
   3. publicar o "NDesk - Notificações" com o roteiro nó a nó do spec §8.1 (as cinco linhas da tabela, cada
      remoção com a religação);
   4. desativar "LB - Atribuição de Ticket" e "LB - Liberação de Pontos".
@@ -1342,9 +1343,8 @@ existe só em produção.
    Um N2 recebe um ID do Discord no cadastro e os outros ficam sem.
 5. **Admin › Gerenciar › Distribuição de atendimentos:** cadastrar o N1 e os três N2, escolher o grupo e o
    responsável de Disparos e marcar "Melhoria" e "4 sem previsão" como estados/prioridades que não pesam.
-6. **Admin › Macros:** criar a macro "Análise prévia" só com a ação **Ticket Distribution → Hand over to N2**,
-   sem artigo. **Admin › Módulos de texto:** criar um módulo com a palavra-chave `n2` e o texto "Realizamos uma
-   análise prévia da sua ocorrência…", como o de produção.
+6. **Admin › Macros:** criar a macro "Análise prévia" com uma nota com o texto "Realizamos uma análise prévia da
+   sua ocorrência…", como o módulo de texto `n2` de produção, e a ação **Ticket Distribution → Hand over to N2**.
 7. **Admin › Trigger:** ligar "Distribuição — Entrada" e "Distribuição — Reabertura", que já vêm criados e
    desligados.
 
@@ -1358,10 +1358,9 @@ existe só em produção.
   - comparar a carga da tela com a soma dos tickets.
 - A recusa sem complexidade, individual e em lote: o aviso fica até ser fechado e nada é gravado. Testar em
   Chrome, Firefox e Safari.
-- O repasse como o N1 vai fazer em produção (spec §5.3): na resposta, digitar `::n2` e Enter, preencher a
-  complexidade e enviar pela macro "Análise prévia" (seta ao lado de Atualizar). A resposta sai e o ticket vai
-  para o N2. Sem complexidade, a macro é recusada, a resposta continua no editor e nada é enviado. Pelo
-  Atualizar, a resposta sai e o dono não muda.
+- O repasse como o N1 vai fazer em produção (spec §5.3): preencher a complexidade e aplicar a macro "Análise
+  prévia" (seta ao lado de Atualizar). A nota sai e o ticket vai para o N2. Sem complexidade, a macro é recusada
+  e nada é enviado. Uma resposta escrita e enviada pelo Atualizar sai sem repasse: o dono não muda.
 - Repasse não realizado (todos os N2 desligados): nota interna do Sistema, sino para quem aplicou e dono
   inalterado.
 - Reabertura pelo cliente (responder um ticket fechado): volta para quem atendeu. Com quem atendeu
